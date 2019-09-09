@@ -1,4 +1,4 @@
-from b-tree.RootPage import *
+from btree.RootPage import *
 
 class Page(RootPage):
     """A Page of the B-Tree.

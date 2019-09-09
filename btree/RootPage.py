@@ -1,4 +1,4 @@
-from b-tree.constants import *
+from btree.constants import *
 
 class RootPage:
     """The root of the B-Tree."""
@@ -15,9 +15,9 @@ class RootPage:
     def insert(self, element):
         """Inserts a number in the B-Tree."""
         
-        if type(element) in supported_list_types:
+        if type(element) in SUPPORTED_LIST_TYPES:
             for item in element: self.insert(item)
-        elif type(element) in supported_types:
+        elif type(element) in SUPPORTED_TYPES:
             self.keys.append(element)
         else:
             raise TypeError("This type is not supported. Type of the element: {}".format(type(element)))
