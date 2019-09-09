@@ -5,4 +5,3 @@ class BTree:
     
     def __init__(self, min_num_keys, *args):
         self.root = RootPage(min_num_keys, *args)
-        self.height = 0
