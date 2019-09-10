@@ -18,3 +18,4 @@ def insert_crescent(element, array):
             return
     array.append(element)
     return
+
