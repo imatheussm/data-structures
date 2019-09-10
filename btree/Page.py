@@ -56,3 +56,6 @@ class Page:
 
         if len(self.keys) > self.max_num_keys:
             raise DegreeOverflow(self)
+    
+    def __repr__(self):
+        return "[" + " - ".join([(str(key)) for key in self.keys]) + "]"
