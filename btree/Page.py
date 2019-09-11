@@ -1,5 +1,6 @@
 import btree.helper as helper
-from btree.DegreeOverflow import *
+from btree.constants import *
+from btree.DegreeOverflowError import *
 
 
 class Page:
@@ -25,13 +26,18 @@ class Page:
         self.max_num_keys = 2 * min_num_keys
         self.min_num_keys = min_num_keys
         self.num_keys = 0
-        if parent_tree:
-            self.parent_page = parent_page
         if parent_page:
+            self.parent_page = parent_page
+        if parent_tree:
             self.parent_tree = parent_tree
 
-        for arg in args:
-            self.insert(arg)
+        self.insert(args)
+
+    def __contains__(self,value):
+        return value in self.keys
+
+    def __repr__(self):
+        return "[ " + " | ".join([(str(key)) for key in self.keys]) + " ]"
 
     def insert(self, element):
         """Inserts a number in the B-Tree."""
@@ -53,9 +59,7 @@ class Page:
             )
         self.num_keys += 1
 
-        if len(self.keys) > self.max_num_keys:
-            print("DegreeOverflow!")
-            raise DegreeOverflow(self)
-    
-    def __repr__(self):
-        return "[" + " - ".join([(str(key)) for key in self.keys]) + "]"
+        #try:
+        #    if len(self.keys) > self.max_num_keys:
+        #        raise DegreeOverflowError(self)
+        #    else: raise NotImplementedError
