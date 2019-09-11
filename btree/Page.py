@@ -1,5 +1,4 @@
 import btree.helper as helper
-from btree.RootPage import *
 from btree.DegreeOverflow import *
 
 
@@ -55,6 +54,7 @@ class Page:
         self.num_keys += 1
 
         if len(self.keys) > self.max_num_keys:
+            print("DegreeOverflow!")
             raise DegreeOverflow(self)
     
     def __repr__(self):

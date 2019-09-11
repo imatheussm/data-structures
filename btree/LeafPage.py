@@ -9,11 +9,10 @@ class LeafPage(Page):
         min_num_keys,
         parent_tree=None,
         parent_page=None,
-        descendent_pages=None,
         *args,
     ):
         super().__init__(
-            min_num_keys, parent_tree, parent_page, descendent_pages, *args
+            min_num_keys, parent_tree, parent_page, None, *args
         )
         del self.descendent_pages
 
