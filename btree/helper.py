@@ -19,3 +19,9 @@ def insert_crescent(element, array):
     array.append(element)
     return
 
+
+def is_class(obj, class_name):
+    try:
+        return obj.__module__ == "btree." + class_name and type(obj).__name__ == class_name
+    except:
+        return False
