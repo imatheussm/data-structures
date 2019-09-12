@@ -31,7 +31,7 @@ class Page:
 
     def __len__(self):
         return len(self.keys)
-    
+
     def __iter__(self):
         return iter(self.keys)
 
@@ -51,7 +51,10 @@ class Page:
             if self[i] > element:
                 return self.descendent_pages[i]
         return self.descendent_pages[len(self)]
-    
+
     def find(self, element):
-        try: return self.keys.index(element)
-        except ValueError: return None
+        try:
+            return self.keys.index(element)
+        except ValueError:
+            return None
+
