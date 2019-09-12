@@ -74,18 +74,61 @@ class BTree:
             A Page object containing the elements to be treated.
         """
         middle_index = page.min_num_keys  # int((len(page.keys) - 1) / 2)
-        left_child = page.keys[:middle_index].copy()
-        right_child = page.keys[middle_index + 1 :].copy()
+        left_keys = page[:middle_index].copy()
+        middle_key = page[middle_index]
+        right_keys = page[middle_index + 1 :].copy()
 
-        print("left_child: {}, right_child: {}".format(left_child, right_child))
+        print("[BTree.promote()] left_keys: {}".format(left_keys))
+        print("[BTree.promote()] middle_key: {}".format(middle_key))
+        print("[BTree.promote()] right_keys: {}".format(right_keys))
 
-        page.keys = [page.keys[middle_index]]
-        page.descendent_pages[0] = Page(page.min_num_keys, page.parent_tree, page)
-        for child in left_child:
-            page.descendent_pages[0].insert(child)
-        page.descendent_pages[1] = Page(page.min_num_keys, page.parent_tree, page)
-        for child in right_child:
-            page.descendent_pages[1].insert(child)
+        if not is_class(page, "RootPage"):
+            print("[BTree.promote()] Not RootPage!")
+            parent_page = page.parent_page
+            descendent_pages = page.descendent_pages
+
+            insert_crescent(middle_key, parent_page.keys)
+            insertion_index = parent_page.index(middle_key)
+
+            left_child = Page(page.min_num_keys, self, parent_page)
+            for element in left_keys:
+                insert_crescent(element, left_child.keys)
+            left_child.descendent_pages = descendent_pages[:len(left_child)]
+
+            right_child = Page(page.min_num_keys, self, parent_page)
+            for element in right_keys:
+                insert_crescent(element, right_child.keys)
+            right_child.descendent_pages = descendent_pages[len(left_child) + 1 :]
+
+            parent_page.descendent_pages.insert(insertion_index, left_child)
+            parent_page.descendent_pages.insert(insertion_index + 1, right_child)
+            # for child in right_keys:
+            #     insert_crescent(child, parent_page.descendent_pages[insertion_index + 1].keys)
+            parent_page.descendent_pages.remove(page)
+            
+            if len(parent_page) > parent_page.max_num_keys:
+                self.promote(parent_page)
+        else:
+            print("[BTree.promote()] Is RootPage!")
+            descendent_pages = page.descendent_pages
+            
+            left_child = Page(page.min_num_keys, self, page)
+            for element in left_keys:
+                insert_crescent(element, left_child.keys)
+            try:
+                left_child.descendent_pages = page.descendent_pages[:middle_index + 1]
+            except:
+                pass
+            right_child = Page(page.min_num_keys, self, page)
+            for element in right_keys:
+                insert_crescent(element, right_child.keys)
+            try:
+                right_child.descendent_pages = page.descendent_pages[middle_index + 1 :]
+            except:
+                pass
+
+            page.keys = [middle_key]
+            page.descendent_pages = [left_child, right_child]
 
     def demote(self, page):
         pass
