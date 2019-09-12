@@ -21,21 +21,17 @@ class BTree:
         del elements_to_insert
 
     def insert(self, *args):
-        for arg in args:
-            print("[BTree.insert()] Argument: {}".format(arg))
-            if type(arg) in SUPPORTED_LIST_TYPES:
-                for item in arg:
-                    self.insert(arg)
-                return
-            elif type(arg) in SUPPORTED_TYPES:
-                page_pointer = self.find(arg)
-                if page_pointer[0] == True:
+        arguments = merge_to_list(args)
+        for arg in arguments:
+            if type(arg) in SUPPORTED_TYPES:
+                in_tree, page_pointer = self.find(arg)
+                if in_tree:
                     print("O valor {} já está na árvore.".format(arg))
-                    return
+                    continue
                 try:
-                    page_pointer[1].insert(arg)
+                    page_pointer.insert(arg)
                 except DegreeOverflowError as e:
-                    self.promoteRoot(e.page)
+                    self.promote(e.page)
             else:
                 raise TypeError(
                     "This type is not supported. Type of the argumenet: {}".format(
@@ -45,8 +41,8 @@ class BTree:
 
             self.num_keys += 1
 
-    def promoteRoot(self, page):
-        middle_index = int((len(page.keys) - 1) / 2)
+    def promote(self, page):
+        middle_index = page.min_num_keys # int((len(page.keys) - 1) / 2)
         left_child = page.keys[:middle_index].copy()
         right_child = page.keys[middle_index + 1 :].copy()
 
@@ -60,6 +56,9 @@ class BTree:
         for child in right_child:
             page.descendent_pages[1].insert(child)
 
+    def demote(self, page):
+        pass
+
     def find(self, element):
         page_pointer = self.root
 
@@ -72,3 +71,22 @@ class BTree:
                     page_pointer = new_page_pointer
                 else:
                     return (False, page_pointer)
+
+    def remove(self, *args):
+        arguments = merge_to_list(args)
+        for arg in arguments:
+            if type(arg) in SUPPORTED_TYPES:
+                in_tree, page_pointer = self.find(arg)
+                if in_tree == True:
+                    try:
+                        page_pointer.remove(arg)
+                    except DegreeUnderflowError as e:
+                        raise NotImplementedError()
+                else:
+                    raise ValueError("The value {} is not in this tree.".format(arg))
+            else:
+                raise TypeError(
+                    "This type is not supported. Type of the argument: {}".format(
+                        str(type(arg))
+                    )
+                )
