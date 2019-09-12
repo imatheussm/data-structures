@@ -1,7 +1,7 @@
 from btree.helper import *
 from btree.constants import *
 from btree.DegreeOverflowError import *
-
+from btree.DegreeUnderflowError import *
 
 class Page:
     """A Page of the B-Tree.
@@ -58,3 +58,16 @@ class Page:
         except ValueError:
             return None
 
+    def remove(self, element):
+        self.keys.remove(element)
+        self.num_keys -= 1
+        
+        if not is_class(self, "RootPage") and len(self) < self.min_num_keys:
+            raise DegreeUnderflowError(self)
+        
+    def get_descendent_lengths(self):
+        lengths = []
+        for item in self.descendent_pages:
+            if item: lengths.append(len(item))
+            else: lengths.append(0)
+        return tuple(lengths)
