@@ -42,7 +42,7 @@ class BTree:
             self.num_keys += 1
 
     def promote(self, page):
-        middle_index = page.min_num_keys # int((len(page.keys) - 1) / 2)
+        middle_index = page.min_num_keys  # int((len(page.keys) - 1) / 2)
         left_child = page.keys[:middle_index].copy()
         right_child = page.keys[middle_index + 1 :].copy()
 
