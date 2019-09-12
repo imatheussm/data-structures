@@ -40,6 +40,6 @@ def merge_to_list(*args):
         if type(element) in SUPPORTED_LIST_TYPES:
             for item in element:
                 final_list.extend(merge_to_list(item))
-        elif type(element) in SUPPORTED_TYPES:
+        else:
             final_list.append(element)
     return final_list
