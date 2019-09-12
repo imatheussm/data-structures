@@ -14,7 +14,7 @@ class Page:
         # self.depth = 0
         # self.height = 1
         # self.level = self.depth + 1
-        self.descendent_pages = (min_num_keys * 2 + 1) * [None]
+        self.descendent_pages = []
         self.keys = []
         self.max_num_keys = 2 * min_num_keys
         self.min_num_keys = min_num_keys
@@ -50,8 +50,14 @@ class Page:
     def return_pointer(self, element):
         for i in range(len(self)):
             if self[i] > element:
-                return self.descendent_pages[i]
-        return self.descendent_pages[len(self)]
+                try:
+                    return self.descendent_pages[i]
+                except:
+                    return None
+        try:
+            return self.descendent_pages[len(self)]
+        except:
+            return None
 
     def find(self, element):
         try:
@@ -74,3 +80,6 @@ class Page:
             else:
                 lengths.append(0)
         return tuple(lengths)
+
+    def index(self,*args, **kwargs):
+        return self.keys.index(*args, **kwargs)
