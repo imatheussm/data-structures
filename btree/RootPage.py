@@ -6,6 +6,6 @@ from time import sleep
 class RootPage(Page):
     """The root of the B-Tree."""
 
-    def __init__(self, min_num_keys, parent_tree=None, descendent_pages=None, *args):
-        super().__init__(min_num_keys, parent_tree, None, descendent_pages, *args)
+    def __init__(self, min_num_keys, parent_tree=None):
+        super().__init__(min_num_keys, parent_tree, None)
 
