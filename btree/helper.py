@@ -11,7 +11,6 @@ def insert_crescent(element, array):
     array: list
         The list into which the element shall be inserted.
     """
-    print("[helper.insert_crescent()] Element: {}. Array: {}".format(element, array))
     if len(array) == 0:
         array.append(element)
         return
