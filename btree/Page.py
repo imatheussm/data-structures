@@ -39,12 +39,12 @@ class Page:
     def __getitem__(self, *args, **kwargs):
         return self.keys.__getitem__(*args, **kwargs)
 
-    def insert(self, element):
+    def insert(self, element, willRaise=True):
         """Inserts a number in the B-Tree."""
         print("[Page.insert()] Element: {}".format(element))
         insert_crescent(element, self.keys)
         self.num_keys += 1
-        if len(self.keys) > self.max_num_keys:
+        if willRaise and len(self.keys) > self.max_num_keys:
             raise DegreeOverflowError(self)
 
     def return_pointer(self, element):
