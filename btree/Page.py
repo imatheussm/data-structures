@@ -81,5 +81,5 @@ class Page:
                 lengths.append(0)
         return tuple(lengths)
 
-    def index(self,*args, **kwargs):
+    def index(self, *args, **kwargs):
         return self.keys.index(*args, **kwargs)
