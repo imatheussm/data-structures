@@ -178,14 +178,9 @@ class BTree:
 
         if len(pointer.descendent_pages) > 0:
             for child in pointer.descendent_pages:
-                print("Child: {}".format(child))
                 try:
                     if child.parent_page != pointer:
                         child.parent_page = pointer
                 except:
                     child.parent_page = pointer
                 self.update_parent_trees(child)
-        else:
-            try:
-                pointer = LeafPage(pointer.min_num_keys, self, pointer.parent_page)
-            except: pointer = LeafPage(pointer.min_num_keys, self)
