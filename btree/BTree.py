@@ -165,10 +165,15 @@ class BTree:
         for arg in arguments:
             in_tree, page_pointer = self.find(arg)
             if in_tree == True:
-                try:
-                    page_pointer.remove(arg)
-                except DegreeUnderflowError as e:
-                    raise NotImplementedError()
+                if len(page_pointer.descendent_pages) == 0:
+                    try:
+                        page_pointer.remove(arg)
+                    except DegreeUnderflowError as e:
+                        raise NotImplementedError()
+                else:
+                    number = page_pointer.get_adjacent_element()
+                    self.remove(number)
+                    page_pointer.keys[page_pointer.index(arg)] = number
             else:
                 raise ValueError("The value {} is not in this tree.".format(arg))
 
