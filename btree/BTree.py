@@ -1,7 +1,7 @@
 from btree.RootPage import *
 from btree.helper import *
 from btree.DegreeOverflowError import *
-
+from btree.LeafPage import *
 
 class BTree:
     """The B-Tree object per se."""
@@ -81,8 +81,8 @@ class BTree:
         left_descendents = page.descendent_pages[: middle_index + 1]
         right_descendents = page.descendent_pages[middle_index + 1 :]
 
-        left_child = left_child = Page(page.min_num_keys, page.parent_tree)
-        right_child = Page(page.min_num_keys, page.parent_tree)
+        left_child = left_child = Page(page.min_num_keys, self, None)
+        right_child = Page(page.min_num_keys, self, None)
         left_child.descendent_pages = left_descendents
         right_child.descendent_pages = right_descendents
 
@@ -97,8 +97,6 @@ class BTree:
             self.promote_Page(page, left_child, middle_key, right_child)
 
     def promote_RootPage(self, page, left_child, middle_key, right_child):
-        left_child.parent_tree, right_child.parent_tree = page, page
-
         page.keys = [middle_key]
         page.descendent_pages = [left_child, right_child]
 
@@ -108,8 +106,6 @@ class BTree:
         parent_page = page.parent_page
         parent_page.descendent_pages.remove(page)
         del page
-
-        left_child.parent_tree, right_child.parent_tree = parent_page, parent_page
 
         parent_page.insert(middle_key, willRaise=False)
         insertion_index = parent_page.index(middle_key)
@@ -180,7 +176,16 @@ class BTree:
         if not pointer:
             pointer = self.root
 
-        for child in pointer.descendent_pages:
-            if child.parent_page != pointer:
-                child.parent_page = pointer
-            self.update_parent_trees(child)
+        if len(pointer.descendent_pages) > 0:
+            for child in pointer.descendent_pages:
+                print("Child: {}".format(child))
+                try:
+                    if child.parent_page != pointer:
+                        child.parent_page = pointer
+                except:
+                    child.parent_page = pointer
+                self.update_parent_trees(child)
+        else:
+            try:
+                pointer = LeafPage(pointer.min_num_keys, self, pointer.parent_page)
+            except: pointer = LeafPage(pointer.min_num_keys, self)
