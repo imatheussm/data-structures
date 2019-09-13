@@ -73,65 +73,75 @@ class BTree:
         page: Page
             A Page object containing the elements to be treated.
         """
-        middle_index = page.min_num_keys  # int((len(page.keys) - 1) / 2)
-        left_keys = page[:middle_index].copy()
-        middle_key = page[middle_index]
-        right_keys = page[middle_index + 1 :].copy()
-
-        print("[BTree.promote()] left_keys: {}".format(left_keys))
-        print("[BTree.promote()] middle_key: {}".format(middle_key))
-        print("[BTree.promote()] right_keys: {}".format(right_keys))
-
-        if not is_class(page, "RootPage"):
-            print("[BTree.promote()] Not RootPage!")
-            parent_page = page.parent_page
-            descendent_pages = page.descendent_pages
-
-            insert_crescent(middle_key, parent_page.keys)
-            insertion_index = parent_page.index(middle_key)
-
-            left_child = Page(page.min_num_keys, self, parent_page)
-            for element in left_keys:
-                insert_crescent(element, left_child.keys)
-            left_child.descendent_pages = descendent_pages[:len(left_child)]
-
-            right_child = Page(page.min_num_keys, self, parent_page)
-            for element in right_keys:
-                insert_crescent(element, right_child.keys)
-            right_child.descendent_pages = descendent_pages[len(left_child) + 1 :]
-
-            parent_page.descendent_pages.insert(insertion_index, left_child)
-            parent_page.descendent_pages.insert(insertion_index + 1, right_child)
-            # for child in right_keys:
-            #     insert_crescent(child, parent_page.descendent_pages[insertion_index + 1].keys)
-            parent_page.descendent_pages.remove(page)
-            
-            if len(parent_page) > parent_page.max_num_keys:
-                self.promote(parent_page)
-        else:
+        page_items, middle_index = {}, page.min_num_keys
+        
+        page_items["middle_index"] = middle_index  # int((len(page.keys) - 1) / 2)
+        page_items["left_keys"] = page[:middle_index].copy()
+        page_items["middle_key"] = page[middle_index]
+        page_items["right_keys"] = page[middle_index + 1 :].copy()
+        page_items["left_descendents"] = page.descendent_pages[:middle_index + 1]
+        page_items["right_descendents"] = page.descendent_pages[middle_index + 1 :]
+        
+        print("[BTree.promote()] left_keys: {}".format(page_items["left_keys"]))
+        print("[BTree.promote()] middle_key: {}".format(page_items["middle_key"]))
+        print("[BTree.promote()] right_keys: {}".format(page_items["right_keys"]))
+        
+        if is_class(page, "RootPage"):
             print("[BTree.promote()] Is RootPage!")
-            descendent_pages = page.descendent_pages
-            
-            left_child = Page(page.min_num_keys, self, page)
-            for element in left_keys:
-                insert_crescent(element, left_child.keys)
-            try:
-                left_child.descendent_pages = page.descendent_pages[:middle_index + 1]
-            except:
-                pass
-            right_child = Page(page.min_num_keys, self, page)
-            for element in right_keys:
-                insert_crescent(element, right_child.keys)
-            try:
-                right_child.descendent_pages = page.descendent_pages[middle_index + 1 :]
-            except:
-                pass
+            self.promote_RootPage(page, page_items)
+        elif is_class(page, "Page"):
+            print("[BTree.promote()] Is Page!")
+            self.promote_Page(page, page_items)
 
-            page.keys = [middle_key]
-            page.descendent_pages = [left_child, right_child]
+    def promote_RootPage(self, page, page_items):
+        left_child = Page(page.min_num_keys, page.parent_tree, page)
+        right_child = Page(page.min_num_keys, page.parent_tree, page)
+        
+        left_child.descendent_pages = page_items["left_descendents"]
+        right_child.descendent_pages = page_items["right_descendents"]
+        
+        for item in page_items["left_keys"]:
+            left_child.insert(item)
+        for item in page_items["right_keys"]:
+            right_child.insert(item)
+        page.keys = [page_items["middle_key"]]
+        page.descendent_pages = [left_child, right_child]
 
-    def demote(self, page):
-        pass
+    def promote_Page(self, page, page_items):
+        parent_page = page.parent_page
+        print("Attempting to remove {} from {}...".format(page, parent_page))
+        parent_page.descendent_pages.remove(page)
+        
+        left_child = Page(page.min_num_keys, page.parent_tree, parent_page)
+        right_child = Page(page.min_num_keys, page.parent_tree, parent_page)
+        
+        left_child.descendent_pages = page_items["left_descendents"]
+        right_child.descendent_pages = page_items["right_descendents"]
+        
+        for item in page_items["left_keys"]:
+            left_child.insert(item)
+        for item in page_items["right_keys"]:
+            right_child.insert(item)
+        
+        parent_page.insert(page_items["middle_key"], willRaise = False)
+        insertion_index = parent_page.index(page_items["middle_key"])
+        
+        parent_page.descendent_pages.insert(insertion_index, right_child)
+        parent_page.descendent_pages.insert(insertion_index, left_child)
+        
+        # if insertion_index == len(parent_page) - 1:
+        #     print("[BTree.promote_Page()] Inserted last!")
+        #     parent_page.descendent_pages.insert(insertion_index, left_child)
+        #     for item in page_items["right_keys"]:
+        #         parent_page.descendent_pages[insertion_index+1].insert(item, willRaise = False)
+        # else:
+        #     print("[BTree.promote_Page()] Not inserted last!")
+        #     parent_page.descendent_pages.append(right_child)
+        #     for item in page_items["left_keys"]:
+        #         parent_page.descendent_pages[-2].insert(item, willRaise = False)
+        
+        if len(parent_page) > page.max_num_keys:
+            self.promote(parent_page)
 
     def find(self, element):
         """Finds an element in the BTree object.
