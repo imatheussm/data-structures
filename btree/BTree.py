@@ -179,5 +179,5 @@ class BTree:
         if not pointer: pointer = self.root
         
         for child in pointer.descendent_pages:
-            child.parent_page = pointer
+            if child.parent_page != pointer: child.parent_page = pointer
             self.update_parent_trees(child)
