@@ -10,7 +10,7 @@ class Page:
     This page is inherited by RootPage and LeafPage classes.
     """
 
-    def __init__(self, min_num_keys, parent_tree=None, parent_page=None):
+    def __init__(self, min_num_keys, parent_tree, parent_page):
         # self.depth = 0
         # self.height = 1
         # self.level = self.depth + 1
