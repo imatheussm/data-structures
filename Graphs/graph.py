@@ -2,7 +2,7 @@ from node import Node
 from errors import contains_Error
 
 class AdjListGraph:
-    def __init__(self, nodes, type,):
+    def __init__(self, nodes, type):
         self.nodes = {node: Node(node) for node in nodes}
         self.type = type
 
