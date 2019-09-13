@@ -2,7 +2,6 @@ from btree.RootPage import *
 from btree.helper import *
 from btree.DegreeOverflowError import *
 
-
 class BTree:
     """The B-Tree object per se."""
 
@@ -73,74 +72,53 @@ class BTree:
         page: Page
             A Page object containing the elements to be treated.
         """
-        page_items, middle_index = {}, page.min_num_keys
+        middle_index = page.min_num_keys
+
+        left_keys = page[:middle_index].copy()
+        middle_key = page[middle_index]
+        right_keys = page[middle_index + 1 :].copy()
+        left_descendents = page.descendent_pages[:middle_index + 1]
+        right_descendents = page.descendent_pages[middle_index + 1 :]
         
-        page_items["middle_index"] = middle_index  # int((len(page.keys) - 1) / 2)
-        page_items["left_keys"] = page[:middle_index].copy()
-        page_items["middle_key"] = page[middle_index]
-        page_items["right_keys"] = page[middle_index + 1 :].copy()
-        page_items["left_descendents"] = page.descendent_pages[:middle_index + 1]
-        page_items["right_descendents"] = page.descendent_pages[middle_index + 1 :]
+        left_child = left_child = Page(page.min_num_keys, page.parent_tree)
+        right_child = Page(page.min_num_keys, page.parent_tree)
+        left_child.descendent_pages = left_descendents
+        right_child.descendent_pages = right_descendents
         
-        print("[BTree.promote()] left_keys: {}".format(page_items["left_keys"]))
-        print("[BTree.promote()] middle_key: {}".format(page_items["middle_key"]))
-        print("[BTree.promote()] right_keys: {}".format(page_items["right_keys"]))
+        for item in left_keys:
+            left_child.insert(item)
+        for item in right_keys:
+            right_child.insert(item)
         
         if is_class(page, "RootPage"):
-            print("[BTree.promote()] Is RootPage!")
-            self.promote_RootPage(page, page_items)
+            self.promote_RootPage(page, left_child, middle_key, right_child)
         elif is_class(page, "Page"):
-            print("[BTree.promote()] Is Page!")
-            self.promote_Page(page, page_items)
+            self.promote_Page(page, left_child, middle_key, right_child)
 
-    def promote_RootPage(self, page, page_items):
-        left_child = Page(page.min_num_keys, page.parent_tree, page)
-        right_child = Page(page.min_num_keys, page.parent_tree, page)
+    def promote_RootPage(self, page, left_child, middle_key, right_child):
+        left_child.parent_tree, right_child.parent_tree = page, page
         
-        left_child.descendent_pages = page_items["left_descendents"]
-        right_child.descendent_pages = page_items["right_descendents"]
-        
-        for item in page_items["left_keys"]:
-            left_child.insert(item)
-        for item in page_items["right_keys"]:
-            right_child.insert(item)
-        page.keys = [page_items["middle_key"]]
+        page.keys = [middle_key]
         page.descendent_pages = [left_child, right_child]
+        
+        self.update_parent_trees()
 
-    def promote_Page(self, page, page_items):
+    def promote_Page(self, page, left_child, middle_key, right_child):
         parent_page = page.parent_page
-        print("Attempting to remove {} from {}...".format(page, parent_page))
         parent_page.descendent_pages.remove(page)
+        del(page)
         
-        left_child = Page(page.min_num_keys, page.parent_tree, parent_page)
-        right_child = Page(page.min_num_keys, page.parent_tree, parent_page)
+        left_child.parent_tree, right_child.parent_tree = parent_page, parent_page
         
-        left_child.descendent_pages = page_items["left_descendents"]
-        right_child.descendent_pages = page_items["right_descendents"]
-        
-        for item in page_items["left_keys"]:
-            left_child.insert(item)
-        for item in page_items["right_keys"]:
-            right_child.insert(item)
-        
-        parent_page.insert(page_items["middle_key"], willRaise = False)
-        insertion_index = parent_page.index(page_items["middle_key"])
+        parent_page.insert(middle_key, willRaise = False)
+        insertion_index = parent_page.index(middle_key)
         
         parent_page.descendent_pages.insert(insertion_index, right_child)
         parent_page.descendent_pages.insert(insertion_index, left_child)
         
-        # if insertion_index == len(parent_page) - 1:
-        #     print("[BTree.promote_Page()] Inserted last!")
-        #     parent_page.descendent_pages.insert(insertion_index, left_child)
-        #     for item in page_items["right_keys"]:
-        #         parent_page.descendent_pages[insertion_index+1].insert(item, willRaise = False)
-        # else:
-        #     print("[BTree.promote_Page()] Not inserted last!")
-        #     parent_page.descendent_pages.append(right_child)
-        #     for item in page_items["left_keys"]:
-        #         parent_page.descendent_pages[-2].insert(item, willRaise = False)
+        self.update_parent_trees(parent_page)
         
-        if len(parent_page) > page.max_num_keys:
+        if len(parent_page) > parent_page.max_num_keys:
             self.promote(parent_page)
 
     def find(self, element):
@@ -196,3 +174,10 @@ class BTree:
                     raise NotImplementedError()
             else:
                 raise ValueError("The value {} is not in this tree.".format(arg))
+            
+    def update_parent_trees(self, pointer = None):
+        if not pointer: pointer = self.root
+        
+        for child in pointer.descendent_pages:
+            child.parent_page = pointer
+            self.update_parent_trees(child)
