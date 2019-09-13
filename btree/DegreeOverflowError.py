@@ -13,3 +13,8 @@ class DegreeOverflowError(Exception):
         super().__init__(message)
         self.page = page
         self.tree = page.parent_tree
+        
+        print("[DegreeOverflowError.__init__()] Degree overflow!")
+        print("[DegreeOverflowError.__init__()] page: {}".format(page))
+        try: print("[DegreeOverflowError.__init__()] page.parent_page: {}".format(page.parent_page))
+        except: pass
