@@ -8,3 +8,9 @@ def contains_Error(source, destination, container):
         return True
 
     return False
+
+def limitError(start, end, n):
+    if start not in range(0, n) or end not in range(0, n):
+        print("It seems you did something wrong. Please check the values you gave.")
+        return True
+    return False

@@ -1,5 +1,5 @@
-from node import Node
-from errors import contains_Error
+from AdjacencyList.node import Node
+from Graphs.errors import contains_Error
 
 class AdjListGraph:
     def __init__(self, nodes, type):
