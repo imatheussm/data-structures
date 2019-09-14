@@ -189,3 +189,19 @@ class Page:
         print("[BTree.borrow_right()] middle_element: {}".format(element_to_borrow))
         self.parent_page.keys[page_index] = element_to_borrow
         self.insert(middle_element)
+        
+    def get_pages_of_height(self, height, current_pointer = None, current_height = 1):
+        pages = []
+        
+        if not current_pointer:
+            current_pointer = self
+        
+        if current_height < height:
+            if len(current_pointer.descendent_pages) > 0:
+                for descendent in current_pointer.descendent_pages:
+                    pages.append(self.get_pages_of_height(height, descendent, current_height + 1))
+                return pages
+            else:
+                raise ValueError("The tree is not that tall!")
+        else:
+            return current_pointer.keys
