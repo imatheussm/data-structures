@@ -42,3 +42,18 @@ def merge_to_list(*args):
         else:
             final_list.append(element)
     return final_list
+
+
+def merge_to_list_of_lists(*args):
+    final_list = []
+    for element in args:
+        if type(element) in SUPPORTED_LIST_TYPES:
+            try:
+                if type(element[0]) in SUPPORTED_LIST_TYPES:
+                    for item in element:
+                        final_list.extend(merge_to_list_of_lists(item))
+                else:
+                    final_list.append(element)
+            except IndexError:
+                final_list.append([])
+    return final_list
