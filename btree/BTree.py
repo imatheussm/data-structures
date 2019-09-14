@@ -193,5 +193,58 @@ class BTree:
             else:
                 raise ValueError("The value {} is not in this tree.".format(arg))
             
-        def demote(self, page):
-            pass
+    def demote(self, page):
+        parent_page = page.parent_page
+        page_index = page.parent_page.descendent_pages.index(page)
+        print("[BTree.demote()] page_index: {}".format(page_index))
+        if page.get_left_page():
+            print("[BTree.demote()] Calling BTree.demote_left()!")
+            self.demote_left(page, page_index)
+        else:
+            print("[BTree.demote()] Calling BTree.demote_right()!")
+            self.demote_right(page, page_index)
+        
+        self.update_parent_trees(parent_page)
+        
+        if not is_class(parent_page, "RootPage") and len(parent_page) < parent_page.min_num_keys:
+            self.demote(parent_page)
+        
+        elif is_class(parent_page, "RootPage") and len(parent_page) == 0:
+            print("[BTree.demote()] RootPage is empty!")
+            self.recreate_root()
+        
+    def demote_left(self, page, page_index):
+        left_page = page.get_left_page()
+        middle_element = page.parent_page[page_index - 1]
+        print("[BTree.demote_left()] left_page: {}".format(left_page))
+        print("[BTree.demote_left()] middle_element: {}".format(middle_element))
+        page.parent_page.keys.remove(middle_element)
+        left_page.insert(middle_element)
+        for element in page:
+            left_page.insert(element)
+        left_page.descendent_pages = left_page.descendent_pages + page.descendent_pages
+        page.parent_page.descendent_pages.remove(page)
+        del page
+    
+    def demote_right(self, page, page_index):
+        right_page = page.get_right_page()
+        middle_element = page.parent_page[page_index]
+        print("[BTree.demote_right()] right_page: {}".format(right_page))
+        print("[BTree.demote_right()] middle_element: {}".format(middle_element))
+        page.parent_page.keys.remove(middle_element)
+        right_page.insert(middle_element)
+        for element in page:
+            right_page.insert(element)
+        right_page.descendent_pages = page.descendent_pages + right_page.descendent_pages
+        page.parent_page.descendent_pages.remove(page)
+        del page
+        
+    def recreate_root(self):
+        if len(self.root.descendent_pages) > 1:
+            raise ValueError("There's more than a root?")
+        new_root = RootPage(self.root.min_num_keys, self)
+        reference = self.root.descendent_pages[0]
+        new_root.keys = reference.keys.copy()
+        new_root.descendent_pages = reference.descendent_pages.copy()
+        self.root = new_root
+        del reference
