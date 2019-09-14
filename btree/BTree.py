@@ -56,6 +56,7 @@ class BTree:
                 try:
                     page_pointer.insert(arg)
                 except DegreeOverflowError as e:
+                    print("[BTree.insert()] DegreeOverflowError caught! Calling BTree.promote()...")
                     self.promote(e.page)
             else:
                 raise TypeError(
@@ -65,6 +66,7 @@ class BTree:
                 )
 
             self.num_keys += 1
+            self.update_parent_trees()
 
     def find(self, element):
         """Finds an element in the BTree object.
@@ -125,14 +127,16 @@ class BTree:
             right_child.insert(item)
 
         if is_class(page, "RootPage"):
+            print("[BTree.promote()] Is RootPage! RootPage: {} Type: {}".format(page, type(page)))
             self.promote_RootPage(page, left_child, middle_key, right_child)
         elif is_class(page, "Page"):
+            print("[BTree.promote()] Is Page! Page: {} Type: {}".format(page, type(page)))
             self.promote_Page(page, left_child, middle_key, right_child)
 
     def promote_RootPage(self, page, left_child, middle_key, right_child):
         page.keys = [middle_key]
         page.descendent_pages = [left_child, right_child]
-
+        print("[BTree.promote_RootPage()] Page: {}".format(page))
         self.update_parent_trees()
 
     def promote_Page(self, page, left_child, middle_key, right_child):
@@ -146,7 +150,7 @@ class BTree:
         parent_page.descendent_pages.insert(insertion_index, right_child)
         parent_page.descendent_pages.insert(insertion_index, left_child)
 
-        self.update_parent_trees(parent_page)
+        self.update_parent_trees()
 
         if len(parent_page) > parent_page.max_num_keys:
             self.promote(parent_page)
@@ -266,6 +270,8 @@ class BTree:
             spaces = number_of_spaces * " "
             representation = spaces + spaces.join([str(item) for item in self.get_pages_of_height(h)]) + spaces
             representations.insert(0, representation)
+        
+        representations.insert(0, object.__repr__(self))
         
         return "\n".join(representations)
     

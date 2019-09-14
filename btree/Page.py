@@ -47,6 +47,7 @@ class Page:
         insert_crescent(element, self.keys)
         self.num_keys += 1
         if willRaise and len(self.keys) > self.max_num_keys:
+            print("[Page.insert()] Raising DegreeOverflowError!")
             raise DegreeOverflowError(self)
 
     def get_probable_descendent(self, element):
