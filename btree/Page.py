@@ -109,6 +109,9 @@ class Page:
                 else:
                     return pointer[0]
 
+    def get_adjacent_pages(self):
+        return (get_left_page(self), get_right_page(self))
+
     def get_left_page(self):
         page_pointer_index = self.parent_page.descendent_pages.index(self)
         if page_pointer_index == 0:
