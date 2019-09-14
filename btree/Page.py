@@ -27,8 +27,11 @@ class Page:
     def __contains__(self, value):
         return value in self.keys
 
-    def __repr__(self):
-        return "[ " + " | ".join([(str(key)) for key in self.keys]) + " ]"
+    def __repr__(self, compact = False):
+        if compact:
+            return "[" + "|".join([(str(key)) for key in self.keys]) + "]"
+        else:
+            return "[ " + " | ".join([(str(key)) for key in self.keys]) + " ]"
 
     def __len__(self):
         return len(self.keys)
