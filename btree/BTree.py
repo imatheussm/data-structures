@@ -182,8 +182,8 @@ class BTree:
                     try:
                         page_pointer.remove(arg)
                     except DegreeUnderflowError as e:
-                        if self.can_borrow(e.page):
-                            self.borrow(e.page)
+                        if e.page.can_borrow():
+                            e.page.borrow()
                         else:
                             raise NotImplementedError()
                             # self.demote(e.page)
@@ -193,79 +193,6 @@ class BTree:
                     page_pointer.keys[page_pointer.index(arg)] = number
             else:
                 raise ValueError("The value {} is not in this tree.".format(arg))
-
-    def can_borrow(self, page, with_excedent_number=False):
-        if with_excedent_number == True:
-            return (self.can_borrow_left(page), self.can_borrow_right(page))
-        else:
-            return self.can_borrow_left(page)[0] or self.can_borrow_right(page)[0]
-
-    def can_borrow_left(self, page):
-        if not is_class(page, "RootPage"):
-            parent_page = page.parent_page
-            page_index = parent_page.descendent_pages.index(page)
-            if page_index == 0:
-                return (False, 0)
-            else:
-                left_sibling = parent_page.descendent_pages[page_index - 1]
-                if len(left_sibling) > left_sibling.min_num_keys:
-                    return (True, len(left_sibling) - left_sibling.min_num_keys)
-                else:
-                    return (False, 0)
-        else:
-            return (False, 0)
-
-    def can_borrow_right(self, page):
-        if not is_class(page, "RootPage"):
-            parent_page = page.parent_page
-            page_index = parent_page.descendent_pages.index(page)
-            if page_index == len(parent_page) + 1:
-                return (False, 0)
-            else:
-                right_sibling = parent_page.descendent_pages[page_index + 1]
-                if len(right_sibling) > right_sibling.min_num_keys:
-                    return (True, len(right_sibling) - right_sibling.min_num_keys)
-                else:
-                    return (False, 0)
-        else:
-            return (False, 0)
-
-    def borrow(self, page):
-        borrow_possibilities = self.can_borrow(page, True)
-        parent_page = page.parent_page
-        page_index = parent_page.descendent_pages.index(page)
-
-        if borrow_possibilities[0][1] > borrow_possibilities[1][1]:
-            print("[BTree.borrow()] Borrowing from the left page!")
-            return self.borrow_left(page, parent_page, page_index)
-        elif borrow_possibilities[1][1] > borrow_possibilities[0][1]:
-            print("[BTree.borrow()] Borrowing from the right page!")
-            return self.borrow_right(page, parent_page, page_index)
-        else:
-            raise Exception("Cannot borrow!")
-
-    def borrow_left(self, page, parent_page, page_index):
-        print("[BTree.borrow_left()] page: {}".format(page))
-        print("[BTree.borrow_left()] parent_page: {}".format(parent_page))
-        left_page = parent_page.descendent_pages[page_index - 1]
-        print("[BTree.borrow_left()] left_page: {} (index {})".format(left_page, page_index - 1))
-        element_to_borrow = left_page[-1]
-        print("[BTree.borrow_left()] element_to_borrow: {}".format(element_to_borrow))
-        middle_element = parent_page[page_index - 1]
-        left_page.keys.remove(element_to_borrow)
-        print("[BTree.borrow_left()] middle_element: {}".format(element_to_borrow))
-        parent_page.keys[page_index - 1] = element_to_borrow
-        insert_crescent(middle_element, page.keys)
-
-    def borrow_right(self, page, parent_page, page_index):
-        print("[BTree.borrow_left()] page: {}".format(page))
-        print("[BTree.borrow_left()] parent_page: {}".format(parent_page))
-        right_page = parent_page.descendent_pages[page_index + 1]
-        print("[BTree.borrow_left()] right_page: {} (index {})".format(right_page, page_index + 1))
-        element_to_borrow = right_page[0]
-        print("[BTree.borrow_right()] element_to_borrow: {}".format(element_to_borrow))
-        middle_element = parent_page[page_index]
-        right_page.keys.remove(element_to_borrow)
-        print("[BTree.borrow_right()] middle_element: {}".format(element_to_borrow))
-        parent_page.keys[page_index] = element_to_borrow
-        insert_crescent(middle_element, page.keys)
+            
+        def demote(self):
+            pass
