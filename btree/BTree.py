@@ -251,3 +251,36 @@ class BTree:
         new_root.descendent_pages = reference.descendent_pages.copy()
         self.root = new_root
         del reference
+        
+    def __repr__(self):
+        height = self.get_height()
+        representations = [" ".join([str(item) for item in self.get_pages_of_height(height)])]
+        max_length = len(representations[0])
+        
+        for h in range(height - 1,0,-1):
+            list_of_elements = self.get_pages_of_height(h)
+            string_representation = " ".join([str(item) for item in self.get_pages_of_height(h)])
+            list_length = len(list_of_elements)
+            string_length = len(string_representation)
+            number_of_spaces = int((max_length - string_length)/(list_length + 1))
+            spaces = number_of_spaces * " "
+            representation = spaces + spaces.join([str(item) for item in self.get_pages_of_height(h)]) + spaces
+            representations.insert(0, representation)
+        
+        return "\n".join(representations)
+    
+    def get_height(self):
+        height = 1
+        while self.get_pages_of_height(height + 1):
+            height += 1
+        return height
+    
+    def get_pages_of_height(self, height, merge_lists = True):
+        try:
+            pages = self.root.get_pages_of_height(height)
+            if merge_lists:
+                return merge_to_list_of_lists(pages)
+            else:
+                return pages
+        except:
+            return None
