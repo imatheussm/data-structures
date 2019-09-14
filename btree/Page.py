@@ -46,7 +46,7 @@ class Page:
         if willRaise and len(self.keys) > self.max_num_keys:
             raise DegreeOverflowError(self)
 
-    def return_pointer(self, element):
+    def get_probable_descendent(self, element):
         for i in range(len(self)):
             if self[i] > element:
                 try:

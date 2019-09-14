@@ -87,7 +87,7 @@ class BTree:
             if element in page_pointer:
                 return (True, page_pointer)
             else:
-                new_page_pointer = page_pointer.return_pointer(element)
+                new_page_pointer = page_pointer.get_probable_descendent(element)
                 if new_page_pointer:
                     page_pointer = new_page_pointer
                 else:
@@ -185,8 +185,7 @@ class BTree:
                         if e.page.can_borrow():
                             e.page.borrow()
                         else:
-                            raise NotImplementedError()
-                            # self.demote(e.page)
+                            self.demote(e.page)
                 else:
                     number = page_pointer.get_adjacent_element()
                     self.remove(number)
@@ -194,5 +193,5 @@ class BTree:
             else:
                 raise ValueError("The value {} is not in this tree.".format(arg))
             
-        def demote(self):
+        def demote(self, page):
             pass
