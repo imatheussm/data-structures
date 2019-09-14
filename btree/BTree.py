@@ -29,6 +29,9 @@ class BTree:
 
         self.insert(*args)
 
+    def __contains__(self, element):
+        return self.find(element)[0]
+
     def insert(self, *args):
         """Inserts any amount of items into the BTree.
         
