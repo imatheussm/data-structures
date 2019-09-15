@@ -1,7 +1,6 @@
-from btree.RootPage import *
+# from btree.RootPage import *
 from btree.helper import *
-from btree.DegreeOverflowError import *
-from btree.LeafPage import *
+from btree.Page import *
 
 
 class BTree:
@@ -24,7 +23,7 @@ class BTree:
         BTree
             A BTree object.
         """
-        self.root = RootPage(min_num_keys, self)
+        self.root = Page(min_num_keys, self, None)
         self.num_keys = 0
 
         self.insert(*args)
@@ -66,7 +65,6 @@ class BTree:
                 )
 
             self.num_keys += 1
-            self.update_parent_trees()
 
     def find(self, element):
         """Finds an element in the BTree object.
@@ -121,23 +119,29 @@ class BTree:
         left_child.descendent_pages = left_descendents
         right_child.descendent_pages = right_descendents
 
+        for descendent in left_child.descendent_pages:
+            descendent.parent_page = left_child
+        for descendent in right_child.descendent_pages:
+            descendent.parent_page = right_child
+
         for item in left_keys:
             left_child.insert(item)
         for item in right_keys:
             right_child.insert(item)
 
-        if is_class(page, "RootPage"):
+        if page.parent_page == None:
             print("[BTree.promote()] Is RootPage! RootPage: {} Type: {}".format(page, type(page)))
             self.promote_RootPage(page, left_child, middle_key, right_child)
-        elif is_class(page, "Page"):
+        else:
             print("[BTree.promote()] Is Page! Page: {} Type: {}".format(page, type(page)))
             self.promote_Page(page, left_child, middle_key, right_child)
 
     def promote_RootPage(self, page, left_child, middle_key, right_child):
         page.keys = [middle_key]
         page.descendent_pages = [left_child, right_child]
+        left_child.parent_page = page
+        right_child.parent_page = page
         print("[BTree.promote_RootPage()] Page: {}".format(page))
-        self.update_parent_trees()
 
     def promote_Page(self, page, left_child, middle_key, right_child):
         parent_page = page.parent_page
@@ -150,10 +154,13 @@ class BTree:
         parent_page.descendent_pages.insert(insertion_index, right_child)
         parent_page.descendent_pages.insert(insertion_index, left_child)
 
-        self.update_parent_trees()
+        left_child.parent_page = parent_page
+        right_child.parent_page = parent_page
 
         if len(parent_page) > parent_page.max_num_keys:
-            self.promote(parent_page)
+           self.promote(parent_page)
+        elif len(parent_page) < parent_page.min_num_keys:
+           self.demote(parent_page)
 
     def update_parent_trees(self, pointer=None):
         if not pointer:
@@ -213,10 +220,10 @@ class BTree:
         
         self.update_parent_trees(parent_page)
         
-        if not is_class(parent_page, "RootPage") and len(parent_page) < parent_page.min_num_keys:
+        if parent_page.parent_page != None and len(parent_page) < parent_page.min_num_keys:
             self.demote(parent_page)
         
-        elif is_class(parent_page, "RootPage") and len(parent_page) == 0:
+        elif parent_page.parent_page == None and len(parent_page) == 0:
             print("[BTree.demote()] RootPage is empty!")
             self.recreate_root()
         
@@ -249,7 +256,7 @@ class BTree:
     def recreate_root(self):
         if len(self.root.descendent_pages) > 1:
             raise ValueError("There's more than a root?")
-        new_root = RootPage(self.root.min_num_keys, self)
+        new_root = Page(self.root.min_num_keys, self, None)
         reference = self.root.descendent_pages[0]
         new_root.keys = reference.keys.copy()
         new_root.descendent_pages = reference.descendent_pages.copy()

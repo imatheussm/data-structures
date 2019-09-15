@@ -19,8 +19,7 @@ class Page:
         self.max_num_keys = 2 * min_num_keys
         self.min_num_keys = min_num_keys
         self.num_keys = 0
-        if parent_page:
-            self.parent_page = parent_page
+        self.parent_page = parent_page
         if parent_tree:
             self.parent_tree = parent_tree
 
@@ -72,7 +71,7 @@ class Page:
         self.keys.remove(element)
         self.num_keys -= 1
 
-        if not is_class(self, "RootPage") and len(self) < self.min_num_keys:
+        if self.parent_page != None and len(self) < self.min_num_keys:
             raise DegreeUnderflowError(self)
 
     def index(self, *args, **kwargs):
@@ -117,18 +116,24 @@ class Page:
         return (get_left_page(self), get_right_page(self))
 
     def get_left_page(self):
-        page_pointer_index = self.parent_page.descendent_pages.index(self)
-        if page_pointer_index == 0:
+        if self.parent_page == None:
             return None
         else:
-            return self.parent_page.descendent_pages[page_pointer_index - 1]
+            page_pointer_index = self.parent_page.descendent_pages.index(self)
+            if page_pointer_index == 0:
+                return None
+            else:
+                return self.parent_page.descendent_pages[page_pointer_index - 1]
     
     def get_right_page(self):
-        page_pointer_index = self.parent_page.descendent_pages.index(self)
-        if page_pointer_index == len(self.parent_page):
+        if self.parent_page == None:
             return None
         else:
-            return self.parent_page.descendent_pages[page_pointer_index + 1]
+            page_pointer_index = self.parent_page.descendent_pages.index(self)
+            if page_pointer_index == len(self.parent_page):
+                return None
+            else:
+                return self.parent_page.descendent_pages[page_pointer_index + 1]
 
     def can_get_borrowed(self):
         return len(self) - self.min_num_keys
