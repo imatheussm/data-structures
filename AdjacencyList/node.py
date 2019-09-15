@@ -16,6 +16,4 @@ class Node:
         self.adjacents.remove(node)
 
     def isAdj(self, node):
-        if node in self.adjacents:
-            return True
-        return False
+        return True if node in self.adjacents else False
