@@ -144,7 +144,10 @@ class Page:
                 return self.parent_page.descendent_pages[page_pointer_index + 1]
 
     def can_get_borrowed(self):
-        return len(self) - self.min_num_keys
+        if self.is_leaf():
+            return len(self) - self.min_num_keys
+        else:
+            return 0
 
     def can_borrow(self, with_excedent_number=False):
         if with_excedent_number == True:
