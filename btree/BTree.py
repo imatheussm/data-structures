@@ -50,7 +50,7 @@ class BTree:
             if type(arg) in SUPPORTED_TYPES:
                 in_tree, page_pointer, _ = self.find(arg)
                 if in_tree:
-                    raise ValueError("O valor {} já está na árvore.".format(arg))
+                    raise ValueError("The value {} is already in the B-Tree.".format(arg))
                     continue
                 try:
                     page_pointer.insert(arg)
