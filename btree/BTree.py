@@ -130,20 +130,20 @@ class BTree:
             right_child.insert(item)
 
         if page.is_root():
-            # print("[BTree.promote()] Is RootPage! RootPage: {} Type: {}".format(page, type(page)))
-            self.promote_RootPage(page, left_child, middle_key, right_child)
+            print("[BTree.promote()] Is RootPage! RootPage: {} Type: {}".format(page, type(page)))
+            self.promote_root_page(page, left_child, middle_key, right_child)
         else:
-            # print("[BTree.promote()] Is Page! Page: {} Type: {}".format(page, type(page)))
-            self.promote_Page(page, left_child, middle_key, right_child)
+            print("[BTree.promote()] Is Page! Page: {} Type: {}".format(page, type(page)))
+            self.promote_page(page, left_child, middle_key, right_child)
 
-    def promote_RootPage(self, page, left_child, middle_key, right_child):
+    def promote_root_page(self, page, left_child, middle_key, right_child):
         page.keys = [middle_key]
         page.descendent_pages = [left_child, right_child]
         left_child.parent_page = page
         right_child.parent_page = page
-        # print("[BTree.promote_RootPage()] Page: {}".format(page))
+        print("[BTree.promote_root_page()] Page: {}".format(page))
 
-    def promote_Page(self, page, left_child, middle_key, right_child):
+    def promote_page(self, page, left_child, middle_key, right_child):
         parent_page = page.parent_page
         parent_page.descendent_pages.remove(page)
         del page
@@ -158,10 +158,10 @@ class BTree:
         right_child.parent_page = parent_page
 
         if len(parent_page) > parent_page.max_num_keys:
-            print("[BTree.promote_Page()] DegreeOverflowError!")
+            print("[BTree.promote_page()] DegreeOverflowError!")
             self.promote(parent_page)
         elif not parent_page.is_root() and len(parent_page) < parent_page.min_num_keys:
-            print("[BTree.promote_Page()] DegreeUnderflowError!")
+            print("[BTree.promote_page()] DegreeUnderflowError!")
             self.demote(parent_page)
 
     def remove(self, *args):
