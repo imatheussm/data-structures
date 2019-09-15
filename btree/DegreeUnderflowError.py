@@ -13,8 +13,3 @@ class DegreeUnderflowError(Exception):
         super().__init__(message)
         self.page = page
         self.tree = page.parent_tree
-
-        print("[DegreeUnderflowError.__init__()] Degree underflow!")
-        print("[DegreeUnderflowError.__init__()] page: {}".format(page))
-        try: print("[DegreeUnderflowError.__init__()] page.parent_page: {} Type: {}".format(page.parent_page, type(page.parent_page)))
-        except: pass

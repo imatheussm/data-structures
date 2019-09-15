@@ -46,7 +46,6 @@ class Page:
         insert_crescent(element, self.keys)
         self.num_keys += 1
         if will_raise and len(self.keys) > self.max_num_keys:
-            print("[Page.insert()] Raising DegreeOverflowError!")
             raise DegreeOverflowError(self)
 
     def get_probable_descendent(self, element):
@@ -171,42 +170,29 @@ class Page:
         borrow_possibilities = self.can_borrow(True)
 
         if borrow_possibilities[0] > borrow_possibilities[1]:
-            print("[BTree.borrow()] Borrowing from the left page!")
             return self.borrow_left()
         elif borrow_possibilities[1] > borrow_possibilities[0]:
-            print("[BTree.borrow()] Borrowing from the right page!")
             return self.borrow_right()
         elif borrow_possibilities[0] > 0:
-            print("[BTree.borrow()] Borrowing from the left page!")
             return self.borrow_left()
         else:
             raise Exception("Cannot borrow!")
         
     def borrow_left(self):
         page_index = self.parent_page.descendent_pages.index(self)
-        print("[BTree.borrow_left()] page: {}".format(self))
-        print("[BTree.borrow_left()] parent_page: {}".format(self.parent_page))
         left_page = self.get_left_page()
-        print("[BTree.borrow_left()] left_page: {} (index {})".format(left_page, page_index - 1))
         element_to_borrow = left_page[-1]
-        print("[BTree.borrow_left()] element_to_borrow: {}".format(element_to_borrow))
         middle_element = self.parent_page[page_index - 1]
         left_page.remove(element_to_borrow)
-        print("[BTree.borrow_left()] middle_element: {}".format(element_to_borrow))
         self.parent_page.keys[page_index - 1] = element_to_borrow
         self.insert(middle_element)
 
     def borrow_right(self):
         page_index = self.parent_page.descendent_pages.index(self)
-        print("[BTree.borrow_left()] page: {}".format(self))
-        print("[BTree.borrow_left()] parent_page: {}".format(self.parent_page))
         right_page = self.get_right_page()
-        print("[BTree.borrow_left()] right_page: {} (index {})".format(right_page, page_index + 1))
         element_to_borrow = right_page[0]
-        print("[BTree.borrow_right()] element_to_borrow: {}".format(element_to_borrow))
         middle_element = self.parent_page[page_index]
         right_page.remove(element_to_borrow)
-        print("[BTree.borrow_right()] middle_element: {}".format(element_to_borrow))
         self.parent_page.keys[page_index] = element_to_borrow
         self.insert(middle_element)
         
@@ -234,7 +220,6 @@ class Page:
     
     def replace_with_leaf_element(self, element):
         number, number_page = self.get_adjacent_element(element, with_page = True)
-        print("[BTree.remove()] Adjacent element: {}, in page {}".format(number, number_page))
         number_page.remove(number, will_raise = False)
         self.keys[self.index(element)] = number
         

@@ -55,7 +55,6 @@ class BTree:
                 try:
                     page_pointer.insert(arg)
                 except DegreeOverflowError as e:
-                    print("[BTree.insert()] DegreeOverflowError caught! Calling BTree.promote()...")
                     self.promote(e.page)
             else:
                 raise TypeError(
@@ -130,10 +129,8 @@ class BTree:
             right_child.insert(item)
 
         if page.is_root():
-            print("[BTree.promote()] Is RootPage! RootPage: {} Type: {}".format(page, type(page)))
             self.promote_root_page(page, left_child, middle_key, right_child)
         else:
-            print("[BTree.promote()] Is Page! Page: {} Type: {}".format(page, type(page)))
             self.promote_page(page, left_child, middle_key, right_child)
 
     def promote_root_page(self, page, left_child, middle_key, right_child):
@@ -141,7 +138,6 @@ class BTree:
         page.descendent_pages = [left_child, right_child]
         left_child.parent_page = page
         right_child.parent_page = page
-        print("[BTree.promote_root_page()] Page: {}".format(page))
 
     def promote_page(self, page, left_child, middle_key, right_child):
         parent_page = page.parent_page
@@ -158,10 +154,8 @@ class BTree:
         right_child.parent_page = parent_page
 
         if len(parent_page) > parent_page.max_num_keys:
-            print("[BTree.promote_page()] DegreeOverflowError!")
             self.promote(parent_page)
         elif not parent_page.is_root() and len(parent_page) < parent_page.min_num_keys:
-            print("[BTree.promote_page()] DegreeUnderflowError!")
             self.demote(parent_page)
 
     def remove(self, *args):
@@ -182,7 +176,6 @@ class BTree:
             in_tree, page_pointer, arg_index = self.find(arg)
             if in_tree == True:
                 if page_pointer.is_leaf():
-                    print("[BTree.remove()] {} is leaf!".format(page_pointer))
                     try:
                         page_pointer.remove(arg)
                     except DegreeUnderflowError as e:
@@ -192,7 +185,6 @@ class BTree:
                             self.demote(e.page)
                 else:
                     try:
-                        print("[BTree.remove()] {} is not leaf!".format(page_pointer))
                         page_pointer.replace_with_leaf_element(arg)
                     except DegreeUnderflowError as e:
                         self.demote(e.page)
@@ -202,75 +194,51 @@ class BTree:
     def demote(self, page):
         parent_page = page.parent_page
         page_index = page.parent_page.descendent_pages.index(page)
-        print("[BTree.demote()] page: {}".format(page))
-        print("[BTree.demote()] parent_page: {}".format(parent_page))
-        print("[BTree.demote()] page_index: {}".format(page_index))
         if page.get_left_page():
-            print("[BTree.demote()] Calling BTree.demote_left()!")
             self.demote_left(page, page_index)
         else:
-            print("[BTree.demote()] Calling BTree.demote_right()!")
             self.demote_right(page, page_index)
         
         if not parent_page.is_root() and len(parent_page) < parent_page.min_num_keys:
-            print("[BTree.demote()] Page that would be demoted: {}".format(parent_page))
-            print("[BTree.demote()] Page.parent_page: {}".format(parent_page.parent_page))
             self.demote(parent_page)
         
         elif parent_page.is_root() and len(parent_page) == 0:
-            print("[BTree.demote()] RootPage is empty!")
             self.recreate_root()
         
     def demote_left(self, page, page_index):
-        print("[BTree.demote_left()] page: {}".format(page))
         parent_page = page.parent_page
-        print("[BTree.demote_left()] parent_page: {}".format(parent_page))
         left_page = page.get_left_page()
         middle_element = parent_page[page_index - 1]
-        print("[BTree.demote_left()] left_page: {}".format(left_page))
-        print("[BTree.demote_left()] middle_element: {}".format(middle_element))
         parent_page.remove(middle_element, will_raise = False)
         left_page.insert(middle_element, will_raise = False)
         for element in page:
             left_page.insert(element, will_raise = False)
         left_page.descendent_pages = left_page.descendent_pages + page.descendent_pages
-        print("[BTree.demote_left()] Final page: {}".format(left_page))
-        print("[BTree.demote_left()] Final page descendents: {}".format(left_page.descendent_pages))
         parent_page.descendent_pages.remove(page)
         
         left_page.update_descendents_parent_references()
         
         if len(left_page) > left_page.max_num_keys:
-            print("[BTree.demote_left()] DegreeOverflowError!")
             self.promote(left_page)
     
     def demote_right(self, page, page_index):
-        print("[BTree.demote_right()] page: {}".format(page))
         parent_page = page.parent_page
-        print("[BTree.demote_right()] parent_page: {}".format(parent_page))
         right_page = page.get_right_page()
         middle_element = parent_page[page_index]
-        print("[BTree.demote_right()] right_page: {}".format(right_page))
-        print("[BTree.demote_right()] middle_element: {}".format(middle_element))
         parent_page.remove(middle_element, will_raise = False)
         right_page.insert(middle_element, will_raise = False)
         for element in page:
             right_page.insert(element, will_raise = False)
         right_page.descendent_pages = page.descendent_pages + right_page.descendent_pages
-        print("[BTree.demote_right()] Final page: {}".format(right_page))
-        print("[BTree.demote_right()] Final page descendents: {}".format(right_page.descendent_pages))
         parent_page.descendent_pages.remove(page)
         
         right_page.update_descendents_parent_references()
         
         if len(right_page) > right_page.max_num_keys:
-            print("[BTree.demote_left()] DegreeOverflowError!")
             self.promote(right_page)
         
     def recreate_root(self):
         if len(self.root.descendent_pages) > 1:
-            print("[BTree.recreate_root()] self.root: {}".format(self.root))
-            print("[BTree.recreate_root()] self.root.descendent_pages: {}".format(self.root.descendent_pages))
             raise ValueError("There's more than a root?")
         self.root = self.root.descendent_pages[0]
         self.root.parent_page = None
