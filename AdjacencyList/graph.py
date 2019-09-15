@@ -10,26 +10,35 @@ class AdjListGraph:
         try:
             if self.nodes[source].isAdj(destination):
                 print("Edge already exists.")
+                
             elif self.type == 'n-direcionado' and source == destination:
                 print("Self-loops in an undirected graph? No sense.")
+                
             else:
                 self.nodes[source].addAdj(destination)
+                
                 if self.type == "n-direcionado" and source != destination:
                     self.nodes[destination].addAdj(source)
+                    
                 self.nEdges += 1
                 print("Edge added.")
+                
         except KeyError:
             print("This node doesn't exist.")
 
     def removeEdge(self, source, destination):
         try:
             self.nodes[source].removeAdj(destination)
+            
             if self.type == "n-direcionado":
                 self.nodes[destination].removeAdj(source)
+                
             self.nEdges -= 1
             print("Edge removed.")
+            
         except KeyError:
             print("Oh-oh. You must provide existing nodes.")
+            
         except ValueError:
             print("How do you want to remove something that does not even exist? lol")
 
@@ -37,14 +46,17 @@ class AdjListGraph:
         try:
             if self.nodes[source].isAdj(destination):
                 print("An edge was found :)")
+                
             else:
                 print("No edges found :(")
+                
         except KeyError:
             print("Oh-oh. You must provide existing nodes.")
 
     def getAdjacents(self, node):
         try:
             print(node, "->", self.nodes[node].getAdjacents())
+            
         except KeyError:
             print("Oh-oh. You must provide an existing node.")
 
@@ -61,10 +73,13 @@ class AdjListGraph:
     def nodeDegree(self, node):
         try:
             n = 0
+            
             for node2 in self.nodes.keys():
                 if self.nodes[node2].isAdj(node):
                     n += 1
+                    
             print("In-Degree:", n)
             print("Out-Degree:", len(self.nodes[node].adjacents))
+            
         except KeyError:
             print("Oh-oh. You must provide an existing node.")
