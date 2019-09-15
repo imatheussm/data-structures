@@ -164,19 +164,6 @@ class BTree:
             print("[BTree.promote_Page()] DegreeUnderflowError!")
             self.demote(parent_page)
 
-    # def update_parent_trees(self, pointer=None):
-    #     if not pointer:
-    #         pointer = self.root
-
-    #     if len(pointer.descendent_pages) > 0:
-    #         for child in pointer.descendent_pages:
-    #             try:
-    #                 if child.parent_page != pointer:
-    #                     child.parent_page = pointer
-    #             except:
-    #                 child.parent_page = pointer
-    #             self.update_parent_trees(child)
-
     def remove(self, *args):
         """Removes any amount of items of the BTree object.
         
