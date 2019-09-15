@@ -242,7 +242,7 @@ class BTree:
         middle_element = parent_page[page_index - 1]
         print("[BTree.demote_left()] left_page: {}".format(left_page))
         print("[BTree.demote_left()] middle_element: {}".format(middle_element))
-        parent_page.keys.remove(middle_element)
+        parent_page.remove(middle_element, will_raise = False)
         left_page.insert(middle_element, will_raise = False)
         for element in page:
             left_page.insert(element, will_raise = False)
@@ -265,7 +265,7 @@ class BTree:
         middle_element = parent_page[page_index]
         print("[BTree.demote_right()] right_page: {}".format(right_page))
         print("[BTree.demote_right()] middle_element: {}".format(middle_element))
-        parent_page.keys.remove(middle_element)
+        parent_page.remove(middle_element, will_raise = False)
         right_page.insert(middle_element, will_raise = False)
         for element in page:
             right_page.insert(element, will_raise = False)

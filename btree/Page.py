@@ -71,7 +71,7 @@ class Page:
         self.keys.remove(element)
         self.num_keys -= 1
 
-        if self.parent_page != None and len(self) < self.min_num_keys:
+        if will_raise and self.parent_page != None and len(self) < self.min_num_keys:
             raise DegreeUnderflowError(self)
 
     def index(self, *args, **kwargs):
@@ -191,7 +191,7 @@ class Page:
         element_to_borrow = left_page[-1]
         print("[BTree.borrow_left()] element_to_borrow: {}".format(element_to_borrow))
         middle_element = self.parent_page[page_index - 1]
-        left_page.keys.remove(element_to_borrow)
+        left_page.remove(element_to_borrow)
         print("[BTree.borrow_left()] middle_element: {}".format(element_to_borrow))
         self.parent_page.keys[page_index - 1] = element_to_borrow
         self.insert(middle_element)
@@ -205,7 +205,7 @@ class Page:
         element_to_borrow = right_page[0]
         print("[BTree.borrow_right()] element_to_borrow: {}".format(element_to_borrow))
         middle_element = self.parent_page[page_index]
-        right_page.keys.remove(element_to_borrow)
+        right_page.remove(element_to_borrow)
         print("[BTree.borrow_right()] middle_element: {}".format(element_to_borrow))
         self.parent_page.keys[page_index] = element_to_borrow
         self.insert(middle_element)
@@ -235,7 +235,7 @@ class Page:
     def replace_with_leaf_element(self, element):
         number, number_page = self.get_adjacent_element(element, with_page = True)
         print("[BTree.remove()] Adjacent element: {}, in page {}".format(number, number_page))
-        number_page.keys.remove(number)
+        number_page.remove(number, will_raise = False)
         self.keys[self.index(element)] = number
         
         self.update_descendents_parent_references()
