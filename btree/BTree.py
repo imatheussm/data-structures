@@ -55,7 +55,7 @@ class BTree:
                 try:
                     page_pointer.insert(arg)
                 except DegreeOverflowError as e:
-                    # print("[BTree.insert()] DegreeOverflowError caught! Calling BTree.promote()...")
+                    print("[BTree.insert()] DegreeOverflowError caught! Calling BTree.promote()...")
                     self.promote(e.page)
             else:
                 raise TypeError(
