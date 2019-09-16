@@ -3,7 +3,7 @@ import numpy as np
 class AdjMatrixGraph:
     def __init__(self, nNodes, type):
         if nNodes < 1:
-            print("Graphs must have at least one node. It appears you don't care about it so a single node graph was automatically created :)")
+            print("Graphs must have at least one node. It appears you don't care about it, so a single node graph was automatically created :)")
             self.nNodes = 1
         else:
             self.nNodes = nNodes
@@ -107,9 +107,13 @@ class AdjMatrixGraph:
             for x in range(self.nNodes):
                 if self.matrix[x][node]:
                     inDegree += 1
-                    
-            print("In-Degree: ", inDegree)
-            print("Out-Degree: ", outDegree)
-            
+
+            if self.type == "n-direcionado":
+                print("Grau:", inDegree)
+            else:
+                print("Grau:", inDegree+outDegree)        
+                print("In-Degree: ", inDegree)
+                print("Out-Degree: ", outDegree)
+                
         except IndexError:
             print("Oh-oh. You must provide existing nodes.")
