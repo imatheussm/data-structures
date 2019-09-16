@@ -21,29 +21,33 @@ from btree import *
 # tree.insert(64,65,66,67,68,69,70,71,72)
 # tree.insert(40)
 
-to_add = list(range(1,1000))
-to_find = list(range(1,1000))
-to_remove = list(range(1,1000))
-shuffle(to_add)
-shuffle(to_find)
-shuffle(to_remove)
+for degree in range(1,11):
+    print("Current degree: {}...".format(degree))
+    to_add = list(range(1,1000))
+    to_find = list(range(1,1000))
+    to_remove = list(range(1,1000))
+    shuffle(to_add)
+    shuffle(to_find)
+    shuffle(to_remove)
 
-tree = BTree(2, to_add)
+    tree = BTree(degree, to_add)
 
-for i in to_find:
-    in_tree, page_pointer, page_index = tree.find(i)
-    if not in_tree:
-        raise Exception("{} not found!".format(i))
+    for i in to_find:
+        in_tree, page_pointer, page_index = tree.find(i)
+        if not in_tree:
+            raise Exception("{} not found!".format(i))
 
-for i in range(len(to_remove)):
-    if True:
-        print("Removing {}...".format(to_remove[i]))
-        tree.remove(to_remove[i])
-        for i in to_remove[i + 1 :]:
-            in_tree, page_pointer, page_index = tree.find(i)
-            if not in_tree:
-                raise Exception("{} not found!".format(i))
-    else: break
+    for i in range(len(to_remove)):
+        if True:
+            # print("Removing {}...".format(to_remove[i]))
+            tree.remove(to_remove[i])
+            for i in to_remove[i + 1 :]:
+                in_tree, page_pointer, page_index = tree.find(i)
+                if not in_tree:
+                    raise Exception("{} not found!".format(i))
+        else: break
+
+# .keys.remove(
 
 # DEMOTE CRIAR CASO ESPECIAL ROOTPAGE (AGORA PAGE)
 
