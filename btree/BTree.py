@@ -156,6 +156,7 @@ class BTree:
         The method will begin by separating the keys and descendents that will go to each descendent page, as well as the middle key which will remain in the original page.
         
         It is with these values that the method creates two new pages, setting the parent_page attributes and inserting the respective descendents where they are supposed to be.
+        
         Finally, it gives the two newly-created Page objects, the middle key of the current Page object and the Page object itself to self.promote_root_page() or self.promote_page(), depending on whether the Page object to be promoted is a root page or not.
         """
         middle_index = page.min_num_keys

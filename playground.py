@@ -8,44 +8,44 @@ from btree import *
 
 # tree = BTree(2, [1, 7, 14, 20, 80])
 # tree.insert(2, 3, 4)
-# tree = BTree(2, 20, 30, 37, 50)
-# tree.insert(42)
-# tree.insert(47, 41)
-# tree.insert(60)
-# tree.insert(31, 32, 43, 44, 61, 62)
-# tree.insert(33, 45)
-# tree.insert(63)
-# tree.insert(64, 65)
+tree = BTree(2, 20, 30, 37, 50)
+tree.insert(42)
+tree.insert(47, 41)
+tree.insert(60)
+tree.insert(31, 32, 43, 44, 61, 62)
+tree.insert(33, 45)
+tree.insert(63)
+tree.insert(64, 65)
 
 # tree.insert(64, 65, 66, 67, 68, 69, 70, 71, 72)
 # tree.insert(40)
 
-for degree in range(1, 11):
-    print("Current degree: {}...".format(degree))
-    to_add = list(range(1, 1000))
-    to_find = list(range(1, 1000))
-    to_remove = list(range(1, 1000))
-    shuffle(to_add)
-    shuffle(to_find)
-    shuffle(to_remove)
+# for degree in range(1, 11):
+#     print("Current degree: {}...".format(degree))
+#     to_add = list(range(1, 1000))
+#     to_find = list(range(1, 1000))
+#     to_remove = list(range(1, 1000))
+#     shuffle(to_add)
+#     shuffle(to_find)
+#     shuffle(to_remove)
 
-    tree = BTree(degree, to_add)
+#     tree = BTree(degree, to_add)
 
-    for i in to_find:
-        in_tree, page_pointer, page_index = tree.find(i)
-        if not in_tree:
-            raise Exception("{} not found!".format(i))
+#     for i in to_find:
+#         in_tree, page_pointer, page_index = tree.find(i)
+#         if not in_tree:
+#             raise Exception("{} not found!".format(i))
 
-    for i in range(len(to_remove)):
-        if True:
-            # print("Removing {}...".format(to_remove[i]))
-            tree.remove(to_remove[i])
-            for i in to_remove[i + 1 :]:
-                in_tree, page_pointer, page_index = tree.find(i)
-                if not in_tree:
-                    raise Exception("{} not found!".format(i))
-        else:
-            break
+#     for i in range(len(to_remove)):
+#         if True:
+#             # print("Removing {}...".format(to_remove[i]))
+#             tree.remove(to_remove[i])
+#             for i in to_remove[i + 1 :]:
+#                 in_tree, page_pointer, page_index = tree.find(i)
+#                 if not in_tree:
+#                     raise Exception("{} not found!".format(i))
+#         else:
+#             break
 
 # to_add = list(range(1, 100000))
 # to_remove = list(range(1, 10000))
