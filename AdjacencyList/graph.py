@@ -77,9 +77,13 @@ class AdjListGraph:
             for node2 in self.nodes.keys():
                 if self.nodes[node2].isAdj(node):
                     n += 1
-                    
-            print("In-Degree:", n)
-            print("Out-Degree:", len(self.nodes[node].adjacents))
+
+            if self.type == "n-direcionado":
+                print("Grau: ", n)
+            else:        
+                print("Grau: ", n+len(self.nodes[node].adjacents))
+                print("In-Degree:", n)
+                print("Out-Degree:", len(self.nodes[node].adjacents))
             
         except KeyError:
             print("Oh-oh. You must provide an existing node.")
