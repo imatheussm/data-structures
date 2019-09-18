@@ -1,5 +1,8 @@
-
-.vscode/settings.json
+.vscode/*
+Graphs/.vs/*
+Graphs/.vscode/*
 *.pyc
-.ipynb_checkpoints/*
-.vs/*
+ipynb_checkpoints/*
+vs/*
+B-Tree/.vs/*
+B-Tree/.vscode/*
