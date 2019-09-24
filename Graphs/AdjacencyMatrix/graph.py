@@ -50,7 +50,7 @@ class AdjMatrixGraph:
 
     def existsEdge(self, source, destination):
         try:
-            if self.matrix[source][destination] == 1 or (self.type == 'n-direcionado' and self.matrix[destination][source] == 1):
+            if self.matrix[source][destination] == 1:
                 print("An edge was found. :)")
                 
             else:
@@ -74,7 +74,6 @@ class AdjMatrixGraph:
             print("Oh-oh. You must provide existing nodes.")
 
     def showGraph(self):
-        print("Adjacency Matrix:")
         print(" ", "  ".join([str(x) for x in range(len(self.matrix))]))
         
         for i, x in enumerate(self.matrix):
