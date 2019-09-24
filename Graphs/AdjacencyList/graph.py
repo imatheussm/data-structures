@@ -23,20 +23,25 @@ class AdjListGraph:
 
         AdjListGraph
 
-            An Adjacency List Graph object containing a dictionary of Node objects, a type and an initial number of edges (0).
+            An Adjacency List Graph object containing dictionary of Node objects, type and initial number of edges (0) attributes.
 
         Methodology
         -----------
 
-        This constructor initializes the AdjListGraph object.
+        This constructor initializes the AdjListGraph object. 
 
         """
-        self.nodes = {node: Node(node) for node in nodes}
+        if len(nodes) == 0:
+            print("Graphs must have at least one node. A single node graph was automatically created :)")
+            self.nodes = {"A": Node('A')}
+        else:
+            self.nodes = {node: Node(node) for node in nodes}
+
         self.type = type
         self.nEdges = 0
 
     def addEdge(self, source, destination):
-        """Adds an edge between two nodes to the graph.
+        """Adds an edge between two given nodes to the graph.
 
         Parameters
         ----------
@@ -53,7 +58,7 @@ class AdjListGraph:
         Methodology
         -----------
 
-        This method adds an edge between the given nodes. If type is 'n-direcionado', a double way edge is added. If not, a one-way edge is added.
+        This method adds an edge between the given nodes by inserting the identification value of destination node into the list of adjacent nodes of origin node. If type is 'n-direcionado', a double way edge is added. If not, a one-way edge is added.
 
         """
         try:
@@ -76,7 +81,7 @@ class AdjListGraph:
             print("This node doesn't exist.")
 
     def removeEdge(self, source, destination):
-        """Removes the edge between two nodes from the graph.
+        """Removes the edge between two given nodes from the graph.
 
         Parameters
         ----------
@@ -93,7 +98,7 @@ class AdjListGraph:
         Methodology
         -----------
 
-        This method removes the edge between the given nodes. If edge or node doesn't exist, an error occurs. If not, the edge is removed.
+        This method removes the edge between the given nodes by removing the identification value of destination node from the list of adjacent nodes of origin node. If edge or node doesn't exist, an error occurs. If not, the edge is removed. If type is 'n-direcionado', origin node is also removed from destination node's list of adjacent nodes.
 
         """
         try:
@@ -129,7 +134,7 @@ class AdjListGraph:
         Methodology
         -----------
 
-        This method checks the adjacent nodes list of the origin node to see if destination node is there.
+        This method checks the list of adjacent nodes of the origin node to confirm if destination node is there.
 
         """
         try:
@@ -143,7 +148,7 @@ class AdjListGraph:
             print("Oh-oh. You must provide existing nodes.")
 
     def getAdjacents(self, node):
-        """Get the adjacent nodes list of the given node.
+        """Gets the list of adjacent nodes of the given node.
 
         Parameters
         ----------
@@ -152,13 +157,13 @@ class AdjListGraph:
             An Adjacency List Graph object.
 
         node : int or str 
-            The identification value of the node wanted to be checked.
+            The identification value of the node wanted.
 
 
         Methodology
         -----------
 
-        This method uses the Node object method getAdjacents() to get the adjacent nodes list of the given node and print it. If the given node doesn't exist, an error occurs.
+        This method uses the Node object method getAdjacents() to get the list of adjacent nodes of given node and print it. If given node doesn't exist, an error occurs.
 
         """
         try:
@@ -179,14 +184,14 @@ class AdjListGraph:
         Methodology
         -----------
 
-        For each node, this method calls the Node object method getAdjacents() to get the adjacent nodes list of the respective node and print it.
+        For each node, this method calls the Node object method getAdjacents() to get the list of adjacent nodes and print it.
 
         """
         for node in self.nodes:
             print(node, "->", self.nodes[node].getAdjacents())    
 
     def edgesNumber(self):
-        """Provides graph's number of edges.
+        """Provides the number of edges of the graph.
 
         Parameters
         ----------
@@ -197,13 +202,13 @@ class AdjListGraph:
         Methodology
         -----------
 
-        This method uses self.nEdges attribute to provide the number of edges of the graph. If type is 'n-direcionado', the number of edges duplicates.
+        This method uses nEdges attribute to provide the number of edges of the graph. If type is 'n-direcionado', the number of edges duplicates.
 
         """
         print("Number of edges:", self.nEdges*2 if self.type == "n-direcionado" else self.nEdges)
 
     def nodesNumber(self):
-        """Provides graph's number of nodes.
+        """Provides the number of nodes of the graph.
 
         Parameters
         ----------
@@ -214,7 +219,7 @@ class AdjListGraph:
         Methodology
         -----------
 
-        This method calculates the length of the dictionary self.nodes, which is the number of nodes of the graph.
+        This method calculates the length of the dictionary nodes, which is the number of nodes of the graph.
 
         """
         print("Number of nodes:", len(self.nodes))
@@ -234,7 +239,7 @@ class AdjListGraph:
         Methodology
         -----------
 
-        -- continuar -- 
+       This method searches the list of adjacent nodes of each node for input and output edges in order to provide the respective node's degree.
 
         """
         try:

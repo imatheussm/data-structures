@@ -51,10 +51,10 @@ class Node:
         This method represents the Node based on its value.
 
         """
-        return self.value 
+        return str(self.value) 
 
     def getAdjacents(self):
-        """Get adjacent nodes of the respective Node object.
+        """Gets the adjacent nodes of the respective Node object.
 
         Parameters
         ----------
@@ -72,7 +72,7 @@ class Node:
         Methodology
         -----------
 
-        This method converts each item in the adjacent nodes list to string in order to use the join() method to join them.
+        This method converts each item in the list of adjacent nodes to string in order to use the join()method to finally show them.
 
         """
         return ', '.join(str(x) for x in self.adjacents)
@@ -87,12 +87,12 @@ class Node:
             A Node object.
 
         node : int or str
-            The identification value of the adjacent Node to be added. 
+            The identification value of the adjacent node to be added. 
 
         Methodology
         -----------
 
-        This method adds the given node to the adjacent nodes list of the respective node.
+        This method inserts the given node into the list of adjacent nodes of the respective Node.
         """
         self.adjacents.append(node)
 
@@ -106,17 +106,17 @@ class Node:
             A Node object.
 
         node : int or str
-            The identification value of the adjacent Node to be removed. 
+            The identification value of the adjacent node to be removed. 
 
         Methodology
         -----------
 
-        This method removes the given node from the adjacent nodes list of the respective node.
+        This method removes the given node from the list of adjacent nodes of the respective Node.
         """
         self.adjacents.remove(node)
 
     def isAdj(self, node):
-        """Check if a given node is adjacent of the respective Node.
+        """Checks if a given node is adjacent of the respective Node.
 
         Parameters
         ----------
@@ -131,12 +131,12 @@ class Node:
         -----------
 
         bool 
-            Whether the given node is part of adjacent nodes list or not.
+            Whether the given node is part of the list of adjacent nodes or not.
 
 
         Methodology
         -----------
 
-        This method checks if the given node is in the adjacent nodes list of the respective Node.
+        This method checks if the given node is in the list of adjacent nodes of the respective Node.
         """
         return True if node in self.adjacents else False
