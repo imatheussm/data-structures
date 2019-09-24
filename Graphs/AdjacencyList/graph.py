@@ -93,7 +93,7 @@ class AdjListGraph:
         Methodology
         -----------
 
-        This method removes the edge between the given nodes. If edge or node don't exist, an error occurs. If not, the edge is removed.
+        This method removes the edge between the given nodes. If edge or node doesn't exist, an error occurs. If not, the edge is removed.
 
         """
         try:
