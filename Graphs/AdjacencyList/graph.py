@@ -1,9 +1,10 @@
 from AdjacencyList.node import Node
+from warnings import warn
 
 class AdjListGraph:
     """The Adjacency List Graph object."""
 
-    def __init__(self, nodes, type):
+    def __init__(self, nodes, graph_type):
         """The Adjacency List Graph class constructor.
 
         Parameters
@@ -15,15 +16,15 @@ class AdjListGraph:
         nodes : list 
             The list containing graph nodes.
 
-        type : str
-            The direction type of the graph. It can be 'n-direcionado' or 'direcionado'.
+        graph_type : str
+            The direction graph_type of the graph. It can be 'n-direcionado' or 'direcionado'.
 
         Returns
         -------
 
         AdjListGraph
 
-            An Adjacency List Graph object containing dictionary of Node objects, type and initial number of edges (0) attributes.
+            An Adjacency List Graph object containing dictionary of Node objects, graph_type and initial number of edges (0) attributes.
 
         Methodology
         -----------
@@ -32,13 +33,16 @@ class AdjListGraph:
 
         """
         if len(nodes) == 0:
-            print("Graphs must have at least one node. A single node graph was automatically created :)")
+            warn("Graphs must have at least one node. A single node graph was automatically created :)")
             self.nodes = {"A": Node('A')}
         else:
             self.nodes = {node: Node(node) for node in nodes}
 
-        self.type = type
+        self.graph_type = graph_type
         self.nEdges = 0
+
+    def __getitem__(self, key):
+        return self.nodes.__getitem__(key)
 
     def addEdge(self, source, destination):
         """Adds an edge between two given nodes to the graph.
@@ -58,27 +62,25 @@ class AdjListGraph:
         Methodology
         -----------
 
-        This method adds an edge between the given nodes by inserting the identification value of destination node into the list of adjacent nodes of origin node. If type is 'n-direcionado', a double way edge is added. If not, a one-way edge is added.
+        This method adds an edge between the given nodes by inserting the identification value of destination node into the list of adjacent nodes of origin node. If graph_type is 'n-direcionado', a double way edge is added. If not, a one-way edge is added.
 
         """
         try:
-            if self.nodes[source].isAdj(destination):
-                print("Edge already exists.")
+            if self[source].isAdj(destination):
+                raise ValueError("Edge already exists.")
                 
-            elif self.type == 'n-direcionado' and source == destination:
-                print("Self-loops in an undirected graph? No sense.")
+            if self.graph_type == 'n-direcionado' and source == destination:
+                raise ValueError("Self-loops in an undirected graph? No sense.")
+            
+            self.nodes[source].addAdj(destination)
+            
+            if self.graph_type == "n-direcionado" and source != destination:
+                self[destination].addAdj(source)
                 
-            else:
-                self.nodes[source].addAdj(destination)
-                
-                if self.type == "n-direcionado" and source != destination:
-                    self.nodes[destination].addAdj(source)
-                    
-                self.nEdges += 1
-                print("Edge added.")
+            self.nEdges += 1
                 
         except KeyError:
-            print("This node doesn't exist.")
+            raise ValueError("This node doesn't exist.")
 
     def removeEdge(self, source, destination):
         """Removes the edge between two given nodes from the graph.
@@ -98,23 +100,22 @@ class AdjListGraph:
         Methodology
         -----------
 
-        This method removes the edge between the given nodes by removing the identification value of destination node from the list of adjacent nodes of origin node. If edge or node doesn't exist, an error occurs. If not, the edge is removed. If type is 'n-direcionado', origin node is also removed from destination node's list of adjacent nodes.
+        This method removes the edge between the given nodes by removing the identification value of destination node from the list of adjacent nodes of origin node. If edge or node doesn't exist, an error occurs. If not, the edge is removed. If graph_type is 'n-direcionado', origin node is also removed from destination node's list of adjacent nodes.
 
         """
         try:
-            self.nodes[source].removeAdj(destination)
+            self[source].removeAdj(destination)
             
-            if self.type == "n-direcionado":
-                self.nodes[destination].removeAdj(source)
+            if self.graph_type == "n-direcionado":
+                self[destination].removeAdj(source)
                 
             self.nEdges -= 1
-            print("Edge removed.")
             
         except KeyError:
-            print("Oh-oh. You must provide existing nodes.")
+            raise ValueError("Oh-oh. You must provide existing nodes.")
             
         except ValueError:
-            print("How do you want to remove something that does not even exist? lol")
+            raise ValueError("How do you want to remove something that does not even exist? lol")
 
     def existsEdge(self, source, destination):
         """Checks if there's an edge between two given nodes.
@@ -140,12 +141,15 @@ class AdjListGraph:
         try:
             if self.nodes[source].isAdj(destination):
                 print("An edge was found :)")
+                return True
                 
             else:
                 print("No edges found :(")
+                return False
                 
         except KeyError:
-            print("Oh-oh. You must provide existing nodes.")
+            raise ValueError("Oh-oh. You must provide existing nodes.")
+            return False
 
     def getAdjacents(self, node):
         """Gets the list of adjacent nodes of the given node.
@@ -170,7 +174,27 @@ class AdjListGraph:
             print(node, "->", self.nodes[node].getAdjacents())
             
         except KeyError:
-            print("Oh-oh. You must provide an existing node.")
+            raise ValueError("Oh-oh. You must provide an existing node.")
+
+    def __repr__(self):
+        """Prints Graph with the respective representation (Adjancency List).
+
+        Parameters
+        ----------
+
+        self : AdjListGraph
+            An Adjacency List Graph object.
+
+        Methodology
+        -----------
+
+        For each node, this method calls the Node object method getAdjacents() to get the list of adjacent nodes and print it.
+
+        """
+        representation = "<AdjListGraph object>\n"
+        for node in self.keys():
+            representation += str(node) + " -> " + self[node].getAdjacents() + "\n"
+        return representation[:-1]
 
     def showGraph(self):
         """Prints Graph with the respective representation (Adjancency List).
@@ -187,8 +211,7 @@ class AdjListGraph:
         For each node, this method calls the Node object method getAdjacents() to get the list of adjacent nodes and print it.
 
         """
-        for node in self.nodes:
-            print(node, "->", self.nodes[node].getAdjacents())    
+        print(self.__repr__())
 
     def edgesNumber(self):
         """Provides the number of edges of the graph.
@@ -202,10 +225,10 @@ class AdjListGraph:
         Methodology
         -----------
 
-        This method uses nEdges attribute to provide the number of edges of the graph. If type is 'n-direcionado', the number of edges duplicates.
+        This method uses nEdges attribute to provide the number of edges of the graph. If graph_type is 'n-direcionado', the number of edges duplicates.
 
         """
-        print("Number of edges:", self.nEdges*2 if self.type == "n-direcionado" else self.nEdges)
+        print("Number of edges:", self.nEdges*2 if self.graph_type == "n-direcionado" else self.nEdges)
 
     def nodesNumber(self):
         """Provides the number of nodes of the graph.
@@ -245,16 +268,22 @@ class AdjListGraph:
         try:
             n = 0
             
-            for node2 in self.nodes.keys():
-                if self.nodes[node2].isAdj(node):
+            for node2 in self.keys():
+                if self[node2].isAdj(node):
                     n += 1
 
-            if self.type == "n-direcionado":
+            if self.graph_type == "n-direcionado":
                 print("Degree:", n)
             else:        
-                print("Degree:", n+len(self.nodes[node].adjacents))
+                print("Degree:", n+len(self[node].adjacents))
                 print("In-Degree:", n)
-                print("Out-Degree:", len(self.nodes[node].adjacents))
+                print("Out-Degree:", len(self[node].adjacents))
             
         except KeyError:
-            print("Oh-oh. You must provide an existing node.")
+            raise ValueError("Oh-oh. You must provide an existing node.")
+
+    def keys(self, *args, **kwargs):
+        return self.nodes.keys(*args, **kwargs)
+    
+    def values(self, *args, **kwargs):
+        return self.nodes.values(*args, **kwargs)

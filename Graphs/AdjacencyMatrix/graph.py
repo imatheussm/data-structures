@@ -1,29 +1,33 @@
 import numpy as np
+from warnings import warn
 
 class AdjMatrixGraph:
     """The Adjacency Matrix Graph object."""
 
-    def __init__(self, nNodes, type):
+    def __init__(self, nNodes, graph_type):
         """The Adjacency Matrix Graph class constructor.
 
         Parameters
         ----------
 
         self : AdjMatrixGraph
+            
             An Adjacency Matrix Graph object.
 
         nNodes : int 
+            
             The number of nodes of the graph.
 
-        type : str
-            The direction type of the graph. It can be 'n-direcionado' or 'direcionado'.
+        graph_type : str
+            
+            The direction graph_type of the graph. It can be 'n-direcionado' or 'direcionado'.
 
         Returns
         -------
 
         AdjMatrixGraph
 
-            An Adjacency Matrix Graph object containing the attributes number of nodes, matrix representation and type.
+            An Adjacency Matrix Graph object containing the attributes number of nodes, matrix representation and graph_type.
 
         Methodology
         -----------
@@ -32,12 +36,136 @@ class AdjMatrixGraph:
 
         """
         if nNodes < 1:
-            print("Graphs must have at least one node. It appears you don't care about it, so a single node graph was automatically created :)")
+            warn("Graphs must have at least one node. It appears you don't care about it, so a single node graph was automatically created :)")
             self.nNodes = 1
         else:
             self.nNodes = nNodes
         self.matrix = np.zeros((self.nNodes, self.nNodes))
-        self.type = type
+        self.graph_type = graph_type
+
+    def __getitem__(self, *args, **kwargs):
+        """Allows the object to use the [] notation.
+        
+        Arguments
+        ---------
+        
+        self : AdjMatrixGraph
+        
+            An Adjacency Matrix Graph object.
+        
+        *args : list
+        
+            A list of arguments.
+            
+        **kwargs : dict
+        
+            A list of keyworded arguments.
+            
+        Returns
+        -------
+        
+        Object
+        
+            The object contained in the provided index.
+            
+        Methodology
+        -----------
+        
+        This is just a wrapper to use NumPy Array's __getitem__() method.
+        
+        """
+        return self.matrix.__getitem__(*args, **kwargs)
+
+    def __iter__(self, *args, **kwargs):
+        """Allows the object to be iterable.
+        
+        Arguments
+        ---------
+        
+        self : AdjMatrixGraph
+        
+            An AdjMatrixGraph object.
+        
+        *args : list
+        
+            A list of arguments.
+            
+        **kwargs : dict
+        
+            A list of keyworded arguments.
+            
+        Returns
+        -------
+        
+        iterator
+        
+            An iterator for the items of the object.
+            
+        Methodology
+        -----------
+        
+        This is just a wrapper to use NumPy Array's __iter__() method.
+        """
+        return self.matrix.__iter__(*args, **kwargs)
+
+    def __contains__(self, source, destination):
+        """Allows the usage of the 'in' operator.
+        
+        Arguments
+        ---------
+        
+        self : AdjMatrixGraph
+        
+            An AdjMatrixGraph object.
+        
+        source : int
+        
+            The source vertex number.
+            
+        destination : int
+        
+            The destination vertex number.
+            
+        Returns
+        -------
+        
+        bool
+        
+            The result of the verification.
+            
+        Methodology
+        -----------
+        
+        This method verifies if a given pair of (source, destination) vertices exists in the adjacency matrix.
+        """
+        try:
+            return self[source][destination] == 1
+        except:
+            return False
+        
+    def __len__(self):
+        """Allows the usage of the built-in len() function.
+        
+        Arguments
+        ---------
+        
+        self : AdjMatrixGraph
+        
+            An AdjMatrixGraph object.
+            
+        Returns
+        -------
+        
+        int
+        
+            The number of nodes in the current graph.
+            
+        Methodology
+        -----------
+        
+        This method just returns self.nNodes.
+        """
+        return self.nNodes
 
     def addEdge(self, source, destination):
         """Adds an edge between two given nodes of the graph.
@@ -57,29 +185,21 @@ class AdjMatrixGraph:
         Methodology
         -----------
 
-        This method adds an edge between two given nodes by replacing, in the respective pair(source, destination), number 0 with number 1. If type is 'n-direcionado', a double way edge is added. If not, a one-way edge is added.
+        This method adds an edge between two given nodes by replacing, in the respective pair(source, destination), number 0 with number 1. If graph_type is 'n-direcionado', a double way edge is added. If not, a one-way edge is added.
 
         """
         try:
-            if self.matrix[source][destination] == 1:
-                print("This edge already exists.")
-                
+            if self[source][destination] == 1:
+                raise ValueError("This edge already exists.")
+            if self.graph_type == 'n-direcionado':
+                if source == destination:
+                    raise ValueError("Self-loops in an undirected graph? No sense")
+                self[source][destination] = 1
+                self[destination][source] = 1
             else:
-                if self.type == 'n-direcionado':
-                    if source == destination:
-                        print("Self-loops in an undirected graph? No sense")
-                        
-                    else:
-                        self.matrix[source][destination] = 1
-                        self.matrix[destination][source] = 1
-                        print("Edge added.")
-                        
-                else:
-                    self.matrix[source][destination] = 1
-                    print("Edge added.")
-                    
+                self[source][destination] = 1
         except IndexError:
-            print("Oh-oh. You must provide existing nodes.")
+            raise ValueError("Oh-oh. You must provide existing nodes.")
 
     def removeEdge(self, source, destination):
         """Removes the edge between two given nodes from the graph.
@@ -103,19 +223,16 @@ class AdjMatrixGraph:
 
         """
         try:
-            if self.matrix[source][destination] == 0:
-                print("How do you want to remove something that does not even exist? lol")
-                
-            else:
-                self.matrix[source][destination] = 0
-                
-                if self.type == 'n-direcionado':
-                    self.matrix[destination][source] = 0
-                    
-                print("Edge removed.")
+            if self[source][destination] == 0:
+                raise ValueError("How do you want to remove something that does not even exist? lol")
+            
+            self[source][destination] = 0
+            
+            if self.graph_type == 'n-direcionado':
+                self[destination][source] = 0
                 
         except IndexError:
-            print("Oh-oh. You must provide existing nodes.")
+            raise ValueError("Oh-oh. You must provide existing nodes.")
 
     def existsEdge(self, source, destination):
         """Checks if there's an edge between two given nodes.
@@ -138,14 +255,14 @@ class AdjMatrixGraph:
         This method looks for number 1 in the respective pair(source, destination) in the adjacency matrix in order to check the existence of an edge.
         """
         try:
-            if self.matrix[source][destination] == 1:
+            if self[source][destination] == 1:
                 print("An edge was found. :)")
-                
-            else:
-                print("No edges found. :(")
+                return True
+            print("No edges found. :(")
+            return False
                 
         except IndexError:
-            print("Oh-oh. You must provide existing nodes.")
+            raise ValueError("Oh-oh. You must provide existing nodes.")
 
     def getAdjacents(self, node):
         """Gets the list of adjacent nodes of the given node.
@@ -167,19 +284,15 @@ class AdjMatrixGraph:
 
         """
         try:
-            list = []
-            
-            for x in range(self.nNodes):
-                if self.matrix[node][x] == 1:
-                    list.append(x)
+            adjacencies = [x for x in range(self.nNodes) if self[node][x] == 1]
                     
             print(node, "-> ", end='')
-            print(", ".join(str(x) for x in list))
+            print(", ".join(str(x) for x in adjacencies))
             
         except IndexError:
-            print("Oh-oh. You must provide existing nodes.")
+            raise ValueError("Oh-oh. You must provide existing nodes.")
 
-    def showGraph(self):
+    def __repr__(self):
         """Prints Graph with the respective representation (Adjancency Matrix).
 
         Parameters
@@ -194,10 +307,31 @@ class AdjMatrixGraph:
         This method prints the graph in a matrix format with lines and columns identification.
 
         """
-        print(" ", "  ".join([str(x) for x in range(len(self.matrix))]))
+        max_length = len(str(self.nNodes))
+        representation = "<AdjMatrixGraph object>\n"
+        representation += (max_length + 3) * " " + (max_length * " ").join([str(x) for x in range(len(self))]) + "\n\n"
         
-        for i, x in enumerate(self.matrix):
-            print(i, "  ".join([str(int(y)) for y in x]))
+        for i, x in enumerate(self):
+            representation += str(i) + (max_length + 2) * " " + (max_length * " ").join([str(int(y)) for y in x]) + "\n"
+        
+        return representation[:-1]
+
+    def showGraph(self):
+        """Prints Graph with the respective representation (Adjancency Matrix).
+
+        Parameters
+        ----------
+
+        self : AdjMatrixGraph
+            An Adjacency Matrix Graph object.
+
+        Methodology
+        -----------
+
+        This method calls self.__repr__(), which prints the graph in a matrix format with lines and columns identification.
+
+        """
+        print(self.__repr__())
 
     def edgesNumber(self):
         """Provides the number of edges of the graph.
@@ -211,20 +345,14 @@ class AdjMatrixGraph:
         Methodology
         -----------
 
-        This method goes through the matrix looking for number 1. Every time number 1 is found, the counter is increased. If type is 'n-direcionado', the counter is halved.
+        This method goes through the matrix looking for number 1. Every time number 1 is found, the counter is increased. If graph_type is 'n-direcionado', the counter is halved.
 
         """
-        n = 0
-           
-        for x in range(self.nNodes):
-            for y in range(self.nNodes):
-                if self.matrix[x][y] == 1:
-                    n += 1
+        n = self.matrix.sum()
                         
-        if self.type == "n-direcionado":
-           n /= 2
-                
-        print("This graph has {:.0f} edges.". format(n))
+        if self.graph_type == "n-direcionado":
+           return int(n/2)
+        return n
 
     def nodesNumber(self):
         """Provides the number of nodes of the graph.
@@ -264,15 +392,15 @@ class AdjMatrixGraph:
         try:
             outDegree = 0
             for x in range(self.nNodes):
-                if self.matrix[node][x] == 1:
+                if self[node][x] == 1:
                     outDegree += 1
                     
             inDegree = 0
             for x in range(self.nNodes):
-                if self.matrix[x][node]:
+                if self[x][node]:
                     inDegree += 1
 
-            if self.type == "n-direcionado":
+            if self.graph_type == "n-direcionado":
                 print("Grau:", inDegree)
             else:
                 print("Grau:", inDegree+outDegree)        
@@ -280,4 +408,4 @@ class AdjMatrixGraph:
                 print("Out-Degree: ", outDegree)
                 
         except IndexError:
-            print("Oh-oh. You must provide existing nodes.")
+            raise ValueError("Oh-oh. You must provide existing nodes.")
