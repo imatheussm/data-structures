@@ -6,7 +6,7 @@ sys_path.append(getcwd())
 from AdjacencyList import *
 from AdjacencyMatrix import *
 
-print("OLA isso e um teste")
+print("Teste do VS Code no GitHub")
 print ("# ---- POR MATRIZ DE ADJACÊNCIA -----")
 x = AdjMatrixGraph(4, 'n-direcionado')
 x.addEdge(2, 1)
