@@ -350,6 +350,7 @@ class AdjMatrixGraph:
 
         """
         n = self.matrix.sum()
+        n /= 2
         return int(n)
 
     def nodesNumber(self):
