@@ -350,8 +350,8 @@ class AdjMatrixGraph:
 
         """
         n = self.matrix.sum()
-        n /= 2
-        return int(n)
+        nEdges = n if self.graph_type == "direcionado" else int(n/2) 
+        print("Number of edges:", nEdges)
 
     def nodesNumber(self):
         """Provides the number of nodes of the graph.
