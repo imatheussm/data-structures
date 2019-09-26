@@ -53,6 +53,30 @@ class Node:
         """
         return str(self.value) 
 
+    def __repr__(self):
+        """Node representation.
+
+        Parameters
+        ----------
+
+        self : Node
+            A Node object.
+
+        Returns
+        -------
+
+        str
+
+            The identification value of the Node.
+
+        Methodology
+        -----------
+
+        This method represents the Node based on its value.
+
+        """
+        return str(self.value) + " -> " + self.getAdjacents() 
+
     def getAdjacents(self):
         """Gets the adjacent nodes of the respective Node object.
 
