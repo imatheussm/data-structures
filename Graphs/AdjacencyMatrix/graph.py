@@ -191,13 +191,14 @@ class AdjMatrixGraph:
         try:
             if self[source][destination] == 1:
                 raise ValueError("This edge already exists.")
+
             if self.graph_type == 'n-direcionado':
                 if source == destination:
                     raise ValueError("Self-loops in an undirected graph? No sense")
-                self[source][destination] = 1
                 self[destination][source] = 1
-            else:
-                self[source][destination] = 1
+
+            self[source][destination] = 1
+
         except IndexError:
             raise ValueError("Oh-oh. You must provide existing nodes.")
 
@@ -349,10 +350,7 @@ class AdjMatrixGraph:
 
         """
         n = self.matrix.sum()
-                        
-        if self.graph_type == "n-direcionado":
-           return int(n/2)
-        return n
+        return int(n)
 
     def nodesNumber(self):
         """Provides the number of nodes of the graph.
@@ -369,7 +367,7 @@ class AdjMatrixGraph:
         This method just uses the attribute nNodes to inform the number of nodes of the graph.
 
         """
-        print("There are ", self.nNodes, " nodes.") 
+        print("Number of nodes:", self.nNodes) 
 
     def nodeDegree(self, node):
         """Provides the degree of a given node.
@@ -401,9 +399,9 @@ class AdjMatrixGraph:
                     inDegree += 1
 
             if self.graph_type == "n-direcionado":
-                print("Grau:", inDegree)
+                print("Degree:", inDegree)
             else:
-                print("Grau:", inDegree+outDegree)        
+                print("Degree:", inDegree+outDegree)        
                 print("In-Degree: ", inDegree)
                 print("Out-Degree: ", outDegree)
                 

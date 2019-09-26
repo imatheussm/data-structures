@@ -72,7 +72,7 @@ class AdjListGraph:
             if self.graph_type == 'n-direcionado' and source == destination:
                 raise ValueError("Self-loops in an undirected graph? No sense.")
             
-            self.nodes[source].addAdj(destination)
+            self[source].addAdj(destination)
             
             if self.graph_type == "n-direcionado" and source != destination:
                 self[destination].addAdj(source)
@@ -139,7 +139,7 @@ class AdjListGraph:
 
         """
         try:
-            if self.nodes[source].isAdj(destination):
+            if self[source].isAdj(destination):
                 print("An edge was found :)")
                 return True
                 
@@ -149,7 +149,8 @@ class AdjListGraph:
                 
         except KeyError:
             raise ValueError("Oh-oh. You must provide existing nodes.")
-            return False
+        
+        return False
 
     def getAdjacents(self, node):
         """Gets the list of adjacent nodes of the given node.
@@ -171,7 +172,7 @@ class AdjListGraph:
 
         """
         try:
-            print(node, "->", self.nodes[node].getAdjacents())
+            print(node, "->", self[node].getAdjacents())
             
         except KeyError:
             raise ValueError("Oh-oh. You must provide an existing node.")
@@ -228,7 +229,7 @@ class AdjListGraph:
         This method uses nEdges attribute to provide the number of edges of the graph. If graph_type is 'n-direcionado', the number of edges duplicates.
 
         """
-        print("Number of edges:", self.nEdges*2 if self.graph_type == "n-direcionado" else self.nEdges)
+        print("Number of edges:", self.nEdges)
 
     def nodesNumber(self):
         """Provides the number of nodes of the graph.
