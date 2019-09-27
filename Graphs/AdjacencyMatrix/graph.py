@@ -42,7 +42,7 @@ class AdjMatrixGraph:
             self.nNodes = nNodes
         self.matrix = np.zeros((self.nNodes, self.nNodes))
         self.graph_type = graph_type
-
+        
     def __getitem__(self, *args, **kwargs):
         """Allows the object to use the [] notation.
         
@@ -108,7 +108,7 @@ class AdjMatrixGraph:
         """
         return self.matrix.__iter__(*args, **kwargs)
 
-    def __contains__(self, source, destination):
+    def __contains__(self, edge):
         """Allows the usage of the 'in' operator.
         
         Arguments
@@ -118,13 +118,9 @@ class AdjMatrixGraph:
         
             An AdjMatrixGraph object.
         
-        source : int
+        edge : tuple(int, int)
         
-            The source vertex number.
-            
-        destination : int
-        
-            The destination vertex number.
+            The edge origin and destination indexes.
             
         Returns
         -------
@@ -139,7 +135,7 @@ class AdjMatrixGraph:
         This method verifies if a given pair of (source, destination) vertices exists in the adjacency matrix.
         """
         try:
-            return self[source][destination] == 1
+            return self[edge[0]][edge[1]] == 1
         except:
             return False
         
