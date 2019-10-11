@@ -387,9 +387,9 @@ class AdjMatrixGraph:
         try:
             outDegree = 0
             for x in range(self.nNodes):
-                if self[node][x] == 1:
+                if self[node][x]:
                     outDegree += 1
-                    
+
             inDegree = 0
             for x in range(self.nNodes):
                 if self[x][node]:
