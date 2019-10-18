@@ -306,10 +306,10 @@ class AdjMatrixGraph:
         """
         max_length = len(str(self.nNodes))
         representation = "<AdjMatrixGraph object>\n"
-        representation += (max_length + 3) * " " + (max_length * " ").join([str(x) for x in range(len(self))]) + "\n\n"
+        representation += (max_length + 3) * " " + " ".join([str(x).ljust(max_length, " ") for x in range(len(self))]) + "\n\n"
         
         for i, x in enumerate(self):
-            representation += str(i) + (max_length + 2) * " " + (max_length * " ").join([str(int(y)) for y in x]) + "\n"
+            representation += str(i).ljust(max_length + 2, " ") + " ".join([str(int(y)).rjust(max_length, " ") for y in x]) + "\n"
         
         return representation[:-1]
 
