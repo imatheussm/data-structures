@@ -75,9 +75,9 @@ class Node:
         This method represents the Node based on its value.
 
         """
-        return str(self.value) + " -> " + self.getAdjacents() 
+        return str(self.value) + " -> " + self.get_adjacents()
 
-    def getAdjacents(self):
+    def get_adjacents(self):
         """Gets the adjacent nodes of the respective Node object.
 
         Parameters
@@ -96,12 +96,13 @@ class Node:
         Methodology
         -----------
 
-        This method converts each item in the list of adjacent nodes to string in order to use the join()method to finally show them.
+        This method converts each item in the list of adjacent nodes to string in order to use the join()method to
+        finally show them.
 
         """
         return ', '.join(str(x) for x in self.adjacents)
 
-    def addAdj(self, node):
+    def add_adjacent(self, node):
         """Adds an adjacent node to the respective Node.
 
         Parameters
@@ -120,7 +121,7 @@ class Node:
         """
         self.adjacents.append(node)
 
-    def removeAdj(self, node):
+    def remove_adjacent(self, node):
         """Removes an adjacent node from the respective Node.
 
         Parameters
@@ -139,7 +140,7 @@ class Node:
         """
         self.adjacents.remove(node)
 
-    def isAdj(self, node):
+    def is_adjacent(self, node):
         """Checks if a given node is adjacent of the respective Node.
 
         Parameters

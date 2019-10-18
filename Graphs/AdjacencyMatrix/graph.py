@@ -4,7 +4,7 @@ from warnings import warn
 class AdjMatrixGraph:
     """The Adjacency Matrix Graph object."""
 
-    def __init__(self, nNodes, graph_type):
+    def __init__(self, number_of_nodes, graph_type):
         """The Adjacency Matrix Graph class constructor.
 
         Parameters
@@ -14,7 +14,7 @@ class AdjMatrixGraph:
             
             An Adjacency Matrix Graph object.
 
-        nNodes : int 
+        number_of_nodes : int
             
             The number of nodes of the graph.
 
@@ -35,11 +35,11 @@ class AdjMatrixGraph:
         This constructor initializes the AdjMatrixGraph object. 
 
         """
-        if nNodes < 1:
+        if number_of_nodes < 1:
             warn("Graphs must have at least one node. It appears you don't care about it, so a single node graph was automatically created :)")
             self.nNodes = 1
         else:
-            self.nNodes = nNodes
+            self.nNodes = number_of_nodes
         self.matrix = np.zeros((self.nNodes, self.nNodes))
         self.graph_type = graph_type
         
@@ -163,7 +163,7 @@ class AdjMatrixGraph:
         """
         return self.nNodes
 
-    def addEdge(self, source, destination):
+    def add_edge(self, source, destination):
         """Adds an edge between two given nodes of the graph.
 
         Parameters
@@ -198,7 +198,7 @@ class AdjMatrixGraph:
         except IndexError:
             raise ValueError("Oh-oh. You must provide existing nodes.")
 
-    def removeEdge(self, source, destination):
+    def remove_edge(self, source, destination):
         """Removes the edge between two given nodes from the graph.
 
         Parameters
@@ -231,7 +231,7 @@ class AdjMatrixGraph:
         except IndexError:
             raise ValueError("Oh-oh. You must provide existing nodes.")
 
-    def existsEdge(self, source, destination):
+    def is_edge(self, source, destination):
         """Checks if there's an edge between two given nodes.
 
         Parameters
@@ -261,7 +261,7 @@ class AdjMatrixGraph:
         except IndexError:
             raise ValueError("Oh-oh. You must provide existing nodes.")
 
-    def getAdjacents(self, node):
+    def get_adjacency(self, node):
         """Gets the list of adjacent nodes of the given node.
 
         Parameters
@@ -281,10 +281,10 @@ class AdjMatrixGraph:
 
         """
         try:
-            adjacencies = [x for x in range(self.nNodes) if self[node][x] == 1]
+            adjacency = [x for x in range(self.nNodes) if self[node][x] == 1]
                     
             print(node, "-> ", end='')
-            print(", ".join(str(x) for x in adjacencies))
+            print(", ".join(str(x) for x in adjacency))
             
         except IndexError:
             raise ValueError("Oh-oh. You must provide existing nodes.")
@@ -313,24 +313,7 @@ class AdjMatrixGraph:
         
         return representation[:-1]
 
-    def showGraph(self):
-        """Prints Graph with the respective representation (Adjancency Matrix).
-
-        Parameters
-        ----------
-
-        self : AdjMatrixGraph
-            An Adjacency Matrix Graph object.
-
-        Methodology
-        -----------
-
-        This method calls self.__repr__(), which prints the graph in a matrix format with lines and columns identification.
-
-        """
-        print(self.__repr__())
-
-    def edgesNumber(self):
+    def number_of_edges(self):
         """Provides the number of edges of the graph.
 
         Parameters
@@ -349,7 +332,7 @@ class AdjMatrixGraph:
         nEdges = n if self.graph_type == "direcionado" else int(n/2) 
         print("Number of edges:", nEdges)
 
-    def nodesNumber(self):
+    def number_of_nodes(self):
         """Provides the number of nodes of the graph.
         
         Parameters
@@ -366,7 +349,7 @@ class AdjMatrixGraph:
         """
         print("Number of nodes:", self.nNodes) 
 
-    def nodeDegree(self, node):
+    def node_degree(self, node):
         """Provides the degree of a given node.
 
         Parameters
