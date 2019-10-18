@@ -8,3 +8,4 @@ B-Tree/.vs/*
 B-Tree/.vscode/*
 *-checkpoint.ipynb
 Graphs/.idea/*
+*.log
