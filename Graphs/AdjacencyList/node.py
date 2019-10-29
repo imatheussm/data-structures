@@ -28,6 +28,10 @@ class Node:
         """
         self.value = value
         self.adjacents = []
+        self.color = 'b'
+        self.found = None # the time the node was found.
+        self.finished = None # the time the discovery is finished.
+        self.predecessor = None
 
     def __str__(self):
         """Node representation.
@@ -100,7 +104,7 @@ class Node:
         finally show them.
 
         """
-        return ', '.join(str(x) for x in self.adjacents)
+        return self.adjacents
 
     def add_adjacent(self, node):
         """Adds an adjacent node to the respective Node.

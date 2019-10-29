@@ -1,10 +1,11 @@
 import numpy as np
 from warnings import warn
+from edge import Edge
 
 class AdjMatrixGraph:
     """The Adjacency Matrix Graph object."""
 
-    def __init__(self, number_of_nodes, graph_type):
+    def __init__(self, number_of_nodes, directed, pondered):
         """The Adjacency Matrix Graph class constructor.
 
         Parameters
@@ -18,16 +19,18 @@ class AdjMatrixGraph:
             
             The number of nodes of the graph.
 
-        graph_type : str
-            
-            The direction graph_type of the graph. It can be 'n-direcionado' or 'direcionado'.
+       directed: bool
+            The direction of the graph. If directed=True, graph is directed. If directed=False, graph is undirected.
+
+        pondered: bool
+            The graph classification by edge weight. If pondered=True, graph is pondered. If pondered=False, graph is not pondered.
 
         Returns
         -------
 
         AdjMatrixGraph
 
-            An Adjacency Matrix Graph object containing the attributes number of nodes, matrix representation and graph_type.
+            An Adjacency Matrix Graph object containing the attributes number of nodes, matrix representation and graph type (directed/undirected, pondered/not pondered).
 
         Methodology
         -----------
@@ -36,12 +39,15 @@ class AdjMatrixGraph:
 
         """
         if number_of_nodes < 1:
-            warn("Graphs must have at least one node. It appears you don't care about it, so a single node graph was automatically created :)")
+            warn("Graphs must have at least one node. A single node graph was automatically created :)")
             self.nNodes = 1
         else:
             self.nNodes = number_of_nodes
+
         self.matrix = np.zeros((self.nNodes, self.nNodes))
-        self.graph_type = graph_type
+        self.directed = directed
+        self.pondered = pondered
+        self.edges = []
         
     def __getitem__(self, *args, **kwargs):
         """Allows the object to use the [] notation.
@@ -132,7 +138,7 @@ class AdjMatrixGraph:
         Methodology
         -----------
         
-        This method verifies if a given pair of (source, destination) vertices exists in the adjacency matrix.
+        This method verifies if a given pair of (origin, destination) vertices exists in the adjacency matrix.
         """
         try:
             return self[edge[0]][edge[1]] == 1
@@ -163,7 +169,7 @@ class AdjMatrixGraph:
         """
         return self.nNodes
 
-    def add_edge(self, source, destination):
+    def add_edge(self, origin, destination, weight=1):
         """Adds an edge between two given nodes of the graph.
 
         Parameters
@@ -172,7 +178,7 @@ class AdjMatrixGraph:
         self : AdjMatrixGraph
             An Adjacency Matrix Graph object.
 
-        source : int 
+        origin : int 
             The origin node of the edge.
 
         destination : int 
@@ -181,24 +187,26 @@ class AdjMatrixGraph:
         Methodology
         -----------
 
-        This method adds an edge between two given nodes by replacing, in the respective pair(source, destination), number 0 with number 1. If graph_type is 'n-direcionado', a double way edge is added. If not, a one-way edge is added.
+        This method adds an edge between two given nodes by replacing, in the respective pair(origin, destination), number 0 with number 1. If graph_type is 'n-direcionado', a double way edge is added. If not, a one-way edge is added.
 
         """
         try:
-            if self[source][destination] == 1:
+            if self[origin][destination] == 1:
                 raise ValueError("This edge already exists.")
 
-            if self.graph_type == 'n-direcionado':
-                if source == destination:
+            if not self.directed:
+                if origin == destination:
                     raise ValueError("Self-loops in an undirected graph? No sense")
-                self[destination][source] = 1
+                self[destination][origin] = 1
+            
+            self.edges.append(Edge(origin, destination, weight))
 
-            self[source][destination] = 1
+            self[origin][destination] = 1
 
         except IndexError:
             raise ValueError("Oh-oh. You must provide existing nodes.")
 
-    def remove_edge(self, source, destination):
+    def remove_edge(self, origin, destination):
         """Removes the edge between two given nodes from the graph.
 
         Parameters
@@ -207,7 +215,7 @@ class AdjMatrixGraph:
         self : AdjMatrixGraph
             An Adjacency Matrix Graph object.
 
-        source : int 
+        origin : int 
             The origin node of the edge.
 
         destination : int 
@@ -216,22 +224,24 @@ class AdjMatrixGraph:
         Methodology
         -----------
 
-        This method removes the edge between the given nodes by replacing, in the respective pair(source, destination) number 1 with number 0. If edge or node doesn't exist, an error occurs. If not, the edge is removed.
+        This method removes the edge between the given nodes by replacing, in the respective pair(origin, destination) number 1 with number 0. If edge or node doesn't exist, an error occurs. If not, the edge is removed.
 
         """
         try:
-            if self[source][destination] == 0:
+            if self[origin][destination] == 0:
                 raise ValueError("How do you want to remove something that does not even exist? lol")
             
-            self[source][destination] = 0
+            self[origin][destination] = 0
+            self.remove_from_edges(origin, destination)
             
-            if self.graph_type == 'n-direcionado':
-                self[destination][source] = 0
+            if not self.directed:
+                self[destination][origin] = 0
+                self.remove_from_edges(destination, origin)
                 
         except IndexError:
             raise ValueError("Oh-oh. You must provide existing nodes.")
 
-    def is_edge(self, source, destination):
+    def is_edge(self, origin, destination):
         """Checks if there's an edge between two given nodes.
 
         Parameters
@@ -240,7 +250,7 @@ class AdjMatrixGraph:
         self : AdjMatrixGraph
             An Adjacency Matrix Graph object.
 
-        source : int
+        origin : int
             The origin node of the edge.
 
         destination : int 
@@ -249,14 +259,10 @@ class AdjMatrixGraph:
         Methodology
         -----------
 
-        This method looks for number 1 in the respective pair(source, destination) in the adjacency matrix in order to check the existence of an edge.
+        This method looks for number 1 in the respective pair(origin, destination) in the adjacency matrix in order to check the existence of an edge.
         """
         try:
-            if self[source][destination] == 1:
-                print("An edge was found. :)")
-                return True
-            print("No edges found. :(")
-            return False
+            return True if self[origin].is_adjacent(destination) else False
                 
         except IndexError:
             raise ValueError("Oh-oh. You must provide existing nodes.")
@@ -328,9 +334,7 @@ class AdjMatrixGraph:
         This method goes through the matrix looking for number 1. Every time number 1 is found, the counter is increased. If graph_type is 'n-direcionado', the counter is halved.
 
         """
-        n = self.matrix.sum()
-        nEdges = n if self.graph_type == "direcionado" else int(n/2) 
-        print("Number of edges:", nEdges)
+        return self.matrix.sum() if self.directed else int(self.matrix.sum()/2) 
 
     def number_of_nodes(self):
         """Provides the number of nodes of the graph.
@@ -347,7 +351,7 @@ class AdjMatrixGraph:
         This method just uses the attribute nNodes to inform the number of nodes of the graph.
 
         """
-        print("Number of nodes:", self.nNodes) 
+        return self.nNodes 
 
     def node_degree(self, node):
         """Provides the degree of a given node.
@@ -378,12 +382,12 @@ class AdjMatrixGraph:
                 if self[x][node]:
                     inDegree += 1
 
-            if self.graph_type == "n-direcionado":
-                print("Degree:", inDegree)
-            else:
-                print("Degree:", inDegree+outDegree)        
-                print("In-Degree: ", inDegree)
-                print("Out-Degree: ", outDegree)
+            return inDegree if not self.directed else (inDegree, outDegree)
                 
         except IndexError:
             raise ValueError("Oh-oh. You must provide existing nodes.")
+
+    def remove_from_edges(self, origin, destination):
+        for edge in self.edges:
+            if edge.origin == origin and edge.destination == destination:
+                self.edges.remove(edge)
