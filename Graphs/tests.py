@@ -13,3 +13,12 @@ for (origin, destination) in A:
     x.add_edge(origin, destination)
 
 x.depth_search()
+x.breadth_search(4)
+print(x.acyclic())
+print(x.topological())
+x.shortest_path(4, 2)
+print(x.edges)
+x.remove_edge(0, 1)
+print(x.edges)
+x.add_edge(5, 3)
+print(x.edges)

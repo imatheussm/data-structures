@@ -28,10 +28,11 @@ class Node:
         """
         self.value = value
         self.adjacents = []
-        self.color = 'b'
+        self.color = None
         self.found = None # the time the node was found.
         self.finished = None # the time the discovery is finished.
         self.predecessor = None
+        self.distance = None
 
     def __str__(self):
         """Node representation.

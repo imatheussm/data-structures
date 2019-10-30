@@ -1,7 +1,8 @@
 from AdjacencyList.node import Node
 from edge import Edge
 from warnings import warn
-
+import math
+from operator import itemgetter
 
 class AdjListGraph:
     """The Adjacency List Graph object."""
@@ -48,7 +49,11 @@ class AdjListGraph:
         self.directed = directed
         self.pondered = pondered
         self.nEdges = 0
-        self.edges = []
+        self.edges = {}
+
+        for node in self.nodes:
+            self.edges[node] = {}
+
         self.t = 0
 
     def __getitem__(self, key):
@@ -85,8 +90,8 @@ class AdjListGraph:
             if not self.directed and origin == destination:
                 raise ValueError("Self-loops in an undirected graph? No sense.")
 
-            if destination in self.keys():
-                self.edges.append(Edge(origin, destination, weight))    
+            if destination in self.keys():   
+                self.edges[origin][destination] = Edge(weight)
                 self[origin].add_adjacent(destination)
                 self.nEdges += 1
             else:
@@ -94,7 +99,6 @@ class AdjListGraph:
 
             if not self.directed and origin != destination:
                 self[destination].add_adjacent(origin)
-                #self.edges += Edge(destination, origin, weight)
 
         except KeyError:
             raise ValueError("There's something wrong with the nodes.")
@@ -126,11 +130,11 @@ class AdjListGraph:
         """
         try:
             self[origin].remove_adjacent(destination)
-            self.remove_from_edges(origin, destination)
+            del self.edges[origin][destination]
 
             if not self.directed:
                 self[destination].remove_adjacent(origin)
-                self.remove_from_edges(destination, origin)
+                del self.edges[destination][origin]
 
             self.nEdges -= 1
 
@@ -288,11 +292,6 @@ class AdjListGraph:
     def values(self):
         return self.nodes.values()
 
-    def remove_from_edges(self, origin, destination):
-        for edge in self.edges:
-            if edge.origin == origin and edge.destination == destination:
-                self.edges.remove(edge)
-
     def depth_search(self):
         def visit(node):
             self.t += 1
@@ -300,36 +299,107 @@ class AdjListGraph:
             
             for adjacent in self[node].adjacents:
                 if self[adjacent].color == 'b':
-                    self.get_edge(node, adjacent).tipo = "árvore" # Só pra saber se tá classificando direito
-                    self[adjacent].predecessor = node
+                    self.edges[node][adjacent].tipo = "árvore"
                     visit(adjacent)
+
                 if self[adjacent].color == 'c':
-                    self.get_edge(node, adjacent).tipo = "retorno" # Necessário pro algoritmo de grafo acíclico
+                    self.edges[node][adjacent].tipo = "retorno"
             
             self[node].color = 'p'
             self.t += 1
             self[node].finished = self.t
 
-        # Os nós já inicializam com a cor branca, logo não precisa fazer esse procedimento
+        if self.directed:
+            for node in self.nodes:
+                self[node].color = 'b'
+
+            for node in self.nodes:
+                if self[node].color == 'b':
+                    visit(node)
+
+            # Só p saber se tá certo
+            for node in self.nodes:
+                print("Nó: ", self[node], "Descoberta: ", self[node].found, "Término: ", self[node].finished)
+
+            self.t = 0
+
+            # Só p checar se táokei
+            for origem in self.edges:
+                for destino in self.edges[origem]:
+                    print("Origem: ", origem, "Destino: ", destino, "Tipo: ", self.edges[origem][destino].tipo)
+        else:
+            warn("O grafo não é direcionado!")
+
+    def breadth_search(self, origin):
         for node in self.nodes:
-            if self[node].color == 'b':
-                visit(node)
+            if node == origin:
+                continue
+            self[node].color = 'b'
+            self[node].distance = math.inf
+           
+        self[origin].color = 'c'
+        self[origin].distance = 0
+    
+        queue = []
+        queue.append(origin)
 
-        # Só p saber se tá certo
+        while len(queue) != 0:
+            node = queue.pop(0)
+            for adjacent in self[node].adjacents:
+                if self[adjacent].color == 'b':
+                    self[adjacent].color = 'c'
+                    self[adjacent].distance = self[node].distance + 1
+                    self[adjacent].predecessor = node
+                    queue.append(adjacent)
+            self[node].color = 'p'
+
         for node in self.nodes:
-            print("Nó: ", self[node], "Descoberta: ", self[node].found, "Término: ", self[node].finished)
+            print("Nó: ", node, "Distância do nó de origem: ", self[node].distance)
 
-        self.t = 0
+    def acyclic(self):
+        for origem in self.edges:
+            for destino in self.edges[origem]:
+                if self.edges[origem][destino].tipo == 'retorno':
+                    return True
+        return False
 
-        # Só p checar se táokei
-        for edge in self.edges:
-            print("Origem: ", edge.origin, "Destino: ", edge.destination, "Tipo: ", edge.tipo)
+    def topological(self):
+        self.depth_search()
 
-    # Pegar o objeto aresta correspondente
-    def get_edge(self, origin, destination):
-        for edge in self.edges:
-            if edge.origin == origin and edge.destination == destination:
-                return edge
+        if self.directed:
+            list = []
+            for node in self.nodes:
+                list.append([node, self[node].finished])
+            
+            list = sorted(list, key=itemgetter(1), reverse=True)
+            
+            return [l.pop(0) for l in list]
+
+    def shortest_path(self, origin, destination):
+        if origin == destination:
+            print(origin)
+        elif self[destination].predecessor == None:
+            print("Não existe caminho de ", origin, "para ", destination)
+        else:
+            self.shortest_path(origin, self[destination].predecessor)
+            print(destination)
+
+    def strongly_connected(self):
+        self.depth_search()
+        # Calcular a transposta de G
+        # Chamar DFS pro grafo transposto, mas a ordem dos vértices a serem analisados deve ser em ordem descresente de tempo de término (conforme achado na busca realizada no grafo normal)
+        # Printar os vértices que foram percorridos em cada árvore de maneira separada (Eles são os componentes fortemente conexos)
+        
+
+        
+        
+        
+
+
+    
+            
+
+
 
 
         
