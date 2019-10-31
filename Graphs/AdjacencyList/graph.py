@@ -54,7 +54,7 @@ class AdjListGraph:
         for node in self.nodes:
             self.edges[node] = {}
 
-        self.t = 0
+        self.t = 0 # time
 
     def __getitem__(self, key):
         return self.nodes.__getitem__(key)
@@ -87,18 +87,19 @@ class AdjListGraph:
             if self[origin].is_adjacent(destination):
                 raise ValueError("Edge already exists.")
 
-            if not self.directed and origin == destination:
-                raise ValueError("Self-loops in an undirected graph? No sense.")
+            if destination in self.keys():
+                if not self.directed:
+                    if origin == destination:
+                        raise ValueError("Self-loops in an undirected graph? No sense.")
+                    else:
+                        self[destination].add_adjacent(origin)
+                        self.edges[destination][origin] = Edge(weight)
 
-            if destination in self.keys():   
                 self.edges[origin][destination] = Edge(weight)
                 self[origin].add_adjacent(destination)
                 self.nEdges += 1
             else:
                 raise ValueError("Destination doesn't exist.")
-
-            if not self.directed and origin != destination:
-                self[destination].add_adjacent(origin)
 
         except KeyError:
             raise ValueError("There's something wrong with the nodes.")
@@ -192,7 +193,6 @@ class AdjListGraph:
 
         """
         try:
-            #print(node, "->", self[node].get_adjacents())
             return self[node].get_adjacents()
 
         except KeyError:
@@ -280,8 +280,8 @@ class AdjListGraph:
                 if self[node2].is_adjacent(node):
                     n += 1
 
-            return n if not self.directed else (n, len(self[node].adjacents)) # If directed, the degree is the sum of n + self[node]...
-            # Return tuple (in-degree, out-degree)
+            return n if not self.directed else (n, len(self[node].adjacents)) 
+            # Return tuple (in-degree, out-degree) for directed graphs
 
         else:
             raise ValueError("Oh-oh. You must provide an existing node.")
@@ -299,46 +299,41 @@ class AdjListGraph:
             
             for adjacent in self[node].adjacents:
                 if self[adjacent].color == 'b':
-                    self.edges[node][adjacent].tipo = "árvore"
+                    self.edges[node][adjacent].tipo = "árvore" # classifying for acyclic algorithm
                     visit(adjacent)
 
                 if self[adjacent].color == 'c':
-                    self.edges[node][adjacent].tipo = "retorno"
-            
-            self[node].color = 'p'
+                    self.edges[node][adjacent].tipo = "retorno" # classifying for acyclic algorithm
+
             self.t += 1
-            self[node].finished = self.t
+            self[node].color, self[node].finished = 'p', self.t
 
-        if self.directed:
-            for node in self.nodes:
-                self[node].color = 'b'
+        for node in self.nodes:
+            self[node].color = 'b'
 
-            for node in self.nodes:
-                if self[node].color == 'b':
-                    visit(node)
+        for node in self.nodes:
+            if self[node].color == 'b':
+                visit(node)
 
-            # Só p saber se tá certo
-            for node in self.nodes:
-                print("Nó: ", self[node], "Descoberta: ", self[node].found, "Término: ", self[node].finished)
+        self.t = 0 # time restarted at the end of the algorithm
 
-            self.t = 0
+        # displaying the time each node was found and finished.
+        for node in self.nodes:
+            print("Nó: ", self[node], "Descoberta: ", self[node].found, "Término: ", self[node].finished)
 
-            # Só p checar se táokei
-            for origem in self.edges:
-                for destino in self.edges[origem]:
-                    print("Origem: ", origem, "Destino: ", destino, "Tipo: ", self.edges[origem][destino].tipo)
-        else:
-            warn("O grafo não é direcionado!")
+        # check if classification is right. note: just 'árvore' and 'retorno' classifications are implemented.
+        for origem in self.edges:
+            for destino in self.edges[origem]:
+                print("Aresta ", origem, "-", destino, "~ Tipo: ", self.edges[origem][destino].tipo)
 
     def breadth_search(self, origin):
         for node in self.nodes:
             if node == origin:
                 continue
-            self[node].color = 'b'
-            self[node].distance = math.inf
+
+            self[node].color, self[node].distance = 'b', math.inf
            
-        self[origin].color = 'c'
-        self[origin].distance = 0
+        self[origin].color, self[origin].distance = 'c', 0
     
         queue = []
         queue.append(origin)
@@ -353,20 +348,23 @@ class AdjListGraph:
                     queue.append(adjacent)
             self[node].color = 'p'
 
+        # checking
         for node in self.nodes:
-            print("Nó: ", node, "Distância do nó de origem: ", self[node].distance)
+            print("Nó: ", node, "Distância do nó de origem da busca: ", self[node].distance)
 
     def acyclic(self):
-        for origem in self.edges:
-            for destino in self.edges[origem]:
-                if self.edges[origem][destino].tipo == 'retorno':
+        self.depth_search() # a depth search is a requirement for the acyclic algorithm. idk if we should call this method here, since it's printing something. we can take this out but don't forget to CALL DEPTH_SEARCH BEFORE ACYCLIC!!
+
+        for origin in self.edges:
+            for destination in self.edges[origin]:
+                if self.edges[origin][destination].tipo == 'retorno':
                     return True
         return False
 
     def topological(self):
         self.depth_search()
 
-        if self.directed:
+        if self.directed: # i think topological sorting is only for directed graphs. am i wrong?
             list = []
             for node in self.nodes:
                 list.append([node, self[node].finished])
@@ -374,32 +372,55 @@ class AdjListGraph:
             list = sorted(list, key=itemgetter(1), reverse=True)
             
             return [l.pop(0) for l in list]
+        else:
+            warn("O grafo não é direcionado.")
 
     def shortest_path(self, origin, destination):
         if origin == destination:
             print(origin)
+
         elif self[destination].predecessor == None:
-            print("Não existe caminho de ", origin, "para ", destination)
+            print("Não existe caminho de", origin, "para ", destination)
+
         else:
             self.shortest_path(origin, self[destination].predecessor)
             print(destination)
 
+    def strongly_connected_alg(self, node, low, disc, stackMember, st):
+        disc[node] = self.t  # array to store the time each node was found. 
+        low[node] = self.t 
+        self.t += 1
+        stackMember[node] = True
+        st.append(node)
+
+        for adjacent in self[node].adjacents:
+            if disc[adjacent] == -1:
+                self.strongly_connected_alg(adjacent, low, disc, stackMember, st)
+
+                low[node] = min(low[node], low[adjacent])
+
+            elif stackMember[adjacent] == True:
+                low[node] = min(low[node], disc[adjacent])
+        
+        w = -1
+        if low[node] == disc[node]:
+            while w != node:
+                w = st.pop()
+                print (w, end=' ')
+                stackMember[w] = False
+            print("")
+
     def strongly_connected(self):
-        self.depth_search()
-        # Calcular a transposta de G
-        # Chamar DFS pro grafo transposto, mas a ordem dos vértices a serem analisados deve ser em ordem descresente de tempo de término (conforme achado na busca realizada no grafo normal)
-        # Printar os vértices que foram percorridos em cada árvore de maneira separada (Eles são os componentes fortemente conexos)
-        
+        if self.directed:
+            disc = [-1] * len(self.nodes)
+            low = [-1] * len(self.nodes)
+            stackMember = [False] * len(self.nodes)
+            st = []
 
-        
-        
-        
+            for i in range(len(self.nodes)):
+                if disc[i] == -1:
+                    self.strongly_connected_alg(i, low, disc, stackMember, st) 
 
-
-    
-            
-
-
-
-
-        
+            self.t = 0  # time restarted. 
+        else:
+            warn("O grafo não é direcionado!")
