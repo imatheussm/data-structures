@@ -101,6 +101,8 @@ class AdjListGraph:
             else:
                 raise ValueError("Destination doesn't exist.")
 
+            self.sortAdjacents()
+
         except KeyError:
             raise ValueError("There's something wrong with the nodes.")
 
@@ -292,7 +294,7 @@ class AdjListGraph:
     def values(self):
         return self.nodes.values()
 
-    def depth_search(self):
+    def depth_search(self, origin):
         def visit(node):
             self.t += 1
             self[node].found, self[node].color = self.t, 'c'
@@ -311,6 +313,7 @@ class AdjListGraph:
         for node in self.nodes:
             self[node].color = 'b'
 
+        visit(origin)
         for node in self.nodes:
             if self[node].color == 'b':
                 visit(node)
@@ -352,8 +355,8 @@ class AdjListGraph:
         for node in self.nodes:
             print("Nó: ", node, "Distância do nó de origem da busca: ", self[node].distance)
 
-    def acyclic(self):
-        self.depth_search() # a depth search is a requirement for the acyclic algorithm. idk if we should call this method here, since it's printing something. we can take this out but don't forget to CALL DEPTH_SEARCH BEFORE ACYCLIC!!
+    def acyclic(self, start):
+        self.depth_search(start) # a depth search is a requirement for the acyclic algorithm. idk if we should call this method here, since it's printing something. we can take this out but don't forget to CALL DEPTH_SEARCH BEFORE ACYCLIC!!
 
         for origin in self.edges:
             for destination in self.edges[origin]:
@@ -361,8 +364,8 @@ class AdjListGraph:
                     return True
         return False
 
-    def topological(self):
-        self.depth_search()
+    def topological(self, start):
+        self.depth_search(start)
 
         if self.directed: # i think topological sorting is only for directed graphs. am i wrong?
             list = []
@@ -424,3 +427,7 @@ class AdjListGraph:
             self.t = 0  # time restarted. 
         else:
             warn("O grafo não é direcionado!")
+
+    def sortAdjacents(self):
+        for node in self.nodes:
+            self[node].adjacents = sorted(self[node].adjacents)
