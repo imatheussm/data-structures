@@ -355,8 +355,8 @@ class AdjListGraph:
         for node in self.nodes:
             print("Nó: ", node, "Distância do nó de origem da busca: ", self[node].distance)
 
-    def acyclic(self, start):
-        self.depth_search(start) # a depth search is a requirement for the acyclic algorithm. idk if we should call this method here, since it's printing something. we can take this out but don't forget to CALL DEPTH_SEARCH BEFORE ACYCLIC!!
+    def acyclic(self, origin):
+        self.depth_search(origin) # a depth search is a requirement for the acyclic algorithm. idk if we should call this method here, since it's printing something. we can take this out but don't forget to CALL DEPTH_SEARCH BEFORE ACYCLIC!!
 
         for origin in self.edges:
             for destination in self.edges[origin]:
@@ -364,8 +364,8 @@ class AdjListGraph:
                     return True
         return False
 
-    def topological(self, start):
-        self.depth_search(start)
+    def topological(self, origin):
+        self.depth_search(origin)
 
         if self.directed: # i think topological sorting is only for directed graphs. am i wrong?
             list = []
