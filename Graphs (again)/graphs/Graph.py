@@ -6,7 +6,7 @@ class Graph:
     def __init__(self, vertices, is_directed, is_pondered):
         self.__directed = is_directed
         self.__pondered = is_pondered
-        self.__cyclic = None
+        self.__cyclic = False
 
         self.vertices_list = {}
 
@@ -27,7 +27,7 @@ class Graph:
 
     @property
     def vertices(self):
-        return list(self.vertices_list.keys())
+        return sorted(list(self.vertices_list.keys()))
 
     def is_vertex(self, vertex):
         if str(vertex) in self.vertices:

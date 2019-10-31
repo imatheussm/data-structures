@@ -14,7 +14,7 @@ sys_path.append(getcwd())
 # y = graphs.ListGraph(range(1,7), False, False)
 # B = ((6, 4), (4, 3), (4, 5), (5, 2), (2, 3), (5, 1), (2, 1))
 
-y = graphs.ListGraph(range(10), True, False)
+y = graphs.MatrixGraph(range(10), True, False)
 B = ((0, 3), (0, 2), (0, 1), (0, 5), (1, 2), (2, 3), (2, 4), (4, 6), (5, 4), (5, 6), (6, 7), (6, 8), (7, 8), (9, 6))
 
 

@@ -28,8 +28,10 @@ class ListGraph(Graph):
         try:
             if self.vertices_list[origin][destination]:
                 return True
+            else:
+                return False
         except KeyError:
-            False
+            return False
 
     def add_edge(self, origin, destination, weight=1):
         if self.is_edge(origin, destination):
@@ -98,4 +100,4 @@ class ListGraph(Graph):
     def adjacency_of(self, vertex):
         vertex = str(vertex)
 
-        return list(self.vertices_list[vertex].keys())
+        return sorted(list(self.vertices_list[vertex].keys()))

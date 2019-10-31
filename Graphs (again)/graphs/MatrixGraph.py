@@ -12,7 +12,7 @@ class MatrixGraph(Graph):
 
     @property
     def label_to_index_mapping(self):
-        return list(self.vertices_list.items())
+        return sorted(list(self.vertices_list.items()), key=lambda x: x[1])
 
     def __repr__(self):
         max_length = sp.fromiter((len(str(vertex)) for vertex in self.vertices), int, len(self)).max()
