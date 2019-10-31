@@ -1,12 +1,7 @@
-.vscode/*
-Graphs/.vs/*
-Graphs/.vscode/*
 *.pyc
-ipynb_checkpoints/*
-vs/*
-B-Tree/.vs/*
-B-Tree/.vscode/*
 *-checkpoint.ipynb
-Graphs/.idea/*
+*-checkpoint.py
+**/.idea/*
+**/.vs/*
+**/.vscode/*
 *.log
-Graphs/.ipynb_checkpoints/tests-checkpoint.py
