@@ -5,7 +5,7 @@ from graphs import Graph
 
 class ListGraph(Graph):
     def __init__(self, vertices, is_directed, is_pondered):
-        super().__init__(vertices, is_directed, is_pondered)
+        super().__init__(is_directed, is_pondered)
 
         self.vertices_list = {str(vertex): {} for vertex in vertices}
 
@@ -130,6 +130,6 @@ class ListGraph(Graph):
 
     def adjacency_of(self, vertex, with_weight=True):
         if self.is_pondered and with_weight:
-            return sorted(list(self[vertex].items()))
+            return tuple(sorted(list(self[vertex].items())))
 
-        return sorted(list(self[vertex].keys()))
+        return tuple(sorted(list(self[vertex].keys())))

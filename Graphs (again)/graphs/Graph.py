@@ -1,5 +1,5 @@
 class Graph:
-    def __init__(self, vertices, is_directed, is_pondered):
+    def __init__(self, is_directed, is_pondered):
         self._directed = is_directed
         self._pondered = is_pondered
         self.__cyclic = False
@@ -39,13 +39,25 @@ class Graph:
 
     @property
     def vertices(self):
-        return sorted(list(self.vertices_list.keys()))
+        return tuple(sorted(list(self.vertices_list.keys())))
 
     def is_vertex(self, vertex):
         if str(vertex) in self.vertices:
             return True
         else:
             return False
+
+    # @property
+    # def linked_components(self):
+    #     search_times = self.breadth_first_search(self.vertices[0])
+    #     linked_components = {vertex: [vertex] for vertex in search_times.keys() if search_times[vertex][1] is None}
+    #
+    #     for origin in linked_components.keys():
+    #         for destination in self.vertices:
+    #             if origin != destination and self.shortest_path_between(origin, destination) is not None:
+    #                 linked_components[origin].append(destination)
+    #
+    #     return tuple(tuple(component) for component in linked_components.values())
 
     @property
     def edges(self):
@@ -94,7 +106,11 @@ class Graph:
                 self.__current_time += 1
                 self.__depth_search(vertex, search_times)
 
-        del self.__current_time
+        self.__current_time = None
+
+        for vertex in search_times.keys():
+            search_times[vertex] = tuple(search_times[vertex])
+
         return search_times
 
     def __depth_search(self, vertex, search_times):
@@ -130,7 +146,11 @@ class Graph:
                 self.__current_time += 1
                 self.__breadth_search(vertex, search_times, stack)
 
-        del self.__current_time
+        self.__current_time = None
+
+        for vertex in search_times.keys():
+            search_times[vertex] = tuple(search_times[vertex])
+
         return search_times
 
     def __breadth_search(self, vertex, search_times, stack):

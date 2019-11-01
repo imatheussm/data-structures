@@ -5,9 +5,10 @@ from graphs import Graph
 
 class MatrixGraph(Graph):
     def __init__(self, vertices, is_directed, is_pondered):
-        super().__init__(vertices, is_directed, is_pondered)
+        super().__init__(is_directed, is_pondered)
 
         self.vertices_list = {str(vertex): index for index, vertex in enumerate(vertices)}
+
         if self.is_pondered:
             self.__graph = sp.zeros((len(self), len(self)))
         else:
@@ -150,6 +151,6 @@ class MatrixGraph(Graph):
         occurrences = self[vertex, :]
 
         if self.is_pondered and with_weight:
-            return [(self.vertices[i], occurrences[i]) for i in range(self.number_of_vertices) if occurrences[i] != 0]
+            return tuple((self.vertices[i], occurrences[i]) for i in range(self.number_of_vertices) if occurrences[i] != 0)
 
-        return [self.vertices[i] for i in range(self.number_of_vertices) if occurrences[i] != 0]
+        return tuple(self.vertices[i] for i in range(self.number_of_vertices) if occurrences[i] != 0)

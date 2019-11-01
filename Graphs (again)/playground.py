@@ -17,8 +17,14 @@ sys_path.append(getcwd())
 # y = graphs.MatrixGraph(range(10), True, False)
 # B = ((0, 3), (0, 2), (0, 1), (0, 5), (1, 2), (2, 3), (2, 4), (4, 6), (5, 4), (5, 6), (6, 7), (6, 8), (7, 8), (9, 6))
 
-y = graphs.MatrixGraph(list(range(1, 7)), True, False)
-B = ((1, 2), (1, 5), (2, 3), (2, 5), (3, 4), (4, 5), (4, 6))
+# y = graphs.MatrixGraph(list(range(1, 7)), True, False)
+# B = ((1, 2), (1, 5), (2, 3), (2, 5), (3, 4), (4, 5), (4, 6))
+
+y = graphs.MatrixGraph(list(range(6)), False, False)
+B = ((0, 1), (0, 3), (1, 2), (1, 3), (2, 3), (4, 5))
+
+# y = graphs.MatrixGraph(list(range(1, 7)), False, False)
+# B = ((1, 2), (1, 3), (2, 4), (2, 5), (3, 5), (4, 5), (4, 6), (5, 6))
 
 for (origin, destination) in B:
     y.add_edge(origin, destination)
