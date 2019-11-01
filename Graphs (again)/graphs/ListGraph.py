@@ -9,7 +9,6 @@ class ListGraph(Graph):
 
         self.vertices_list = {str(vertex): {} for vertex in vertices}
 
-
     def __getitem__(self, item):
         return self.vertices_list.__getitem__(str(item))
 
@@ -44,13 +43,14 @@ class ListGraph(Graph):
         if type(pondered) is not bool:
             raise TypeError("This property should receive a boolean value.")
 
-        self._pondered = pondered
+        if self._pondered != pondered:
+            self._pondered = pondered
 
-        if not pondered:
-            for origin in self.vertices:
-                for destination in self[origin].keys():
-                    if self[origin][destination] != 0:
-                        self[origin][destination] = 1
+            if not pondered:
+                for origin in self.vertices:
+                    for destination in self[origin].keys():
+                        if self[origin][destination] != 0:
+                            self[origin][destination] = 1
 
     def is_edge(self, origin, destination):
         origin, destination = str(origin), str(destination)
@@ -64,13 +64,14 @@ class ListGraph(Graph):
             return False
 
     def add_edge(self, origin, destination, weight=1):
-        if self.is_edge(origin, destination):
-            raise ValueError("This edge already exists.")
-
         origin, destination = str(origin), str(destination)
 
-        if origin not in self.vertices or destination not in self.vertices:
-            raise KeyError("Non-existent vertex. Add it first and try again.")
+        if not self.is_directed and origin == destination:
+            raise ValueError("Non-directed graphs cannot have loops.")
+        if self.is_edge(origin, destination):
+            raise ValueError("This edge already exists.")
+        if not self.is_vertex(origin) or not self.is_vertex(destination):
+            raise ValueError("Non-existent vertex. Add it first and try again.")
 
         if self.is_pondered:
             if weight == 0:

@@ -45,16 +45,17 @@ class MatrixGraph(Graph):
         if type(pondered) is not bool:
             raise TypeError("This property should receive a boolean value.")
 
-        self._pondered = pondered
+        if self._pondered != pondered:
+            self._pondered = pondered
 
-        if pondered:
-            self.__graph = self.__graph.astype(float)
-        else:
-            self.__graph = self.__graph.astype(int)
-            for origin in range(self.__graph.shape[0]):
-                for destination in range(self.__graph.shape[1]):
-                    if self.__graph[origin, destination] != 0:
-                        self.__graph[origin, destination] = 1
+            if pondered:
+                self.__graph = self.__graph.astype(float)
+            else:
+                self.__graph = self.__graph.astype(int)
+                for origin in range(self.__graph.shape[0]):
+                    for destination in range(self.__graph.shape[1]):
+                        if self.__graph[origin, destination] != 0:
+                            self.__graph[origin, destination] = 1
 
     @property
     def label_to_index_mapping(self):
@@ -86,27 +87,30 @@ class MatrixGraph(Graph):
             return False
 
     def add_edge(self, origin, destination, weight=1):
+        origin, destination = str(origin), str(destination)
+
+        if not self.is_directed and origin == destination:
+            raise ValueError("Non-directed graphs cannot have loops.")
         if self.is_edge(origin, destination):
             raise ValueError("This edge already exists.")
-
-        try:
-            origin, destination = self.vertices_list[str(origin)], self.vertices_list[str(destination)]
-
-            if self.is_pondered:
-                if weight == 0:
-                    raise ValueError("The weight must be a non-null number.")
-
-                self.__graph[origin, destination] = weight
-
-                if not self.is_directed:
-                    self.__graph[destination, origin] = weight
-            else:
-                self.__graph[origin, destination] = 1
-
-                if not self.is_directed:
-                    self.__graph[destination, origin] = 1
-        except KeyError:
+        if not self.is_vertex(origin) or not self.is_vertex(destination):
             raise ValueError("Non-existent vertex. Add it first and try again.")
+
+        origin, destination = self.vertices_list[origin], self.vertices_list[destination]
+
+        if self.is_pondered:
+            if weight == 0:
+                raise ValueError("The weight must be a non-null number.")
+
+            self.__graph[origin, destination] = weight
+
+            if not self.is_directed:
+                self.__graph[destination, origin] = weight
+        else:
+            self.__graph[origin, destination] = 1
+
+            if not self.is_directed:
+                self.__graph[destination, origin] = 1
 
     def remove_edge(self, origin, destination):
         if not self.is_edge(origin, destination):
