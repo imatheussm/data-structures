@@ -8,22 +8,70 @@ class MatrixGraph(Graph):
         super().__init__(vertices, is_directed, is_pondered)
 
         self.vertices_list = {str(vertex): index for index, vertex in enumerate(vertices)}
-        self.__graph = sp.zeros((len(self), len(self)))
+        if self.is_pondered:
+            self.__graph = sp.zeros((len(self), len(self)))
+        else:
+            self.__graph = sp.zeros((len(self), len(self)), dtype=int)
+
+    def __getitem__(self, index):
+        if type(index) is tuple:
+            for vertex in index:
+                if type(vertex) is not slice and not self.is_vertex(vertex):
+                    raise ValueError("Non-existent vertex. Add it first and try again.")
+
+            index = tuple((self.vertices_list[str(item)] if type(item) is not slice else item for item in index ))
+        else:
+            if not self.is_vertex(index):
+                raise ValueError("Non-existent vertex. Add it first and try again.")
+
+            index = self.vertices_list[str(index)]
+
+        return self.__graph.__getitem__(index)
+
+    @property
+    def is_matrix(self):
+        return True
+
+    @property
+    def is_list(self):
+        return False
+
+    @property
+    def is_pondered(self):
+        return self._pondered
+
+    @is_pondered.setter
+    def is_pondered(self, pondered):
+        if type(pondered) is not bool:
+            raise TypeError("This property should receive a boolean value.")
+
+        self._pondered = pondered
+
+        if pondered:
+            self.__graph = self.__graph.astype(float)
+        else:
+            self.__graph = self.__graph.astype(int)
+            for origin in range(self.__graph.shape[0]):
+                for destination in range(self.__graph.shape[1]):
+                    if self.__graph[origin, destination] != 0:
+                        self.__graph[origin, destination] = 1
 
     @property
     def label_to_index_mapping(self):
         return sorted(list(self.vertices_list.items()), key=lambda x: x[1])
 
     def __repr__(self):
-        max_length = sp.fromiter((len(str(vertex)) for vertex in self.vertices), int, len(self)).max()
+        max_vertex_length = sp.fromiter((len(str(vertex)) for vertex in self.vertices), int, len(self)).max()
+        max_value_length = len(str(self.__graph.max()))
+        max_length = max([max_vertex_length, max_value_length])
 
         representation = "<MatrixGraph object>\n"
         representation += (max_length + 2) * " " + " ".join(
-            [str(x).ljust(max_length, " ") for x in self.vertices_list.keys()]) + "\n\n"
+            [str(x).ljust(max_length + 1, " ") for x in self.vertices_list.keys()]) + "\n\n"
 
         for label, index in self.label_to_index_mapping:
             representation += str(label).ljust(max_length + 2, " ") + " ".join(
-                [str(int(n)).ljust(max_length, " ") for n in self.__graph[int(index)]]) + "\n"
+                [str(n).ljust(max_length + 1, " ") for n in self.__graph[int(index)]]) + "\n"
 
         return representation[:-1]
 
@@ -35,7 +83,7 @@ class MatrixGraph(Graph):
             else:
                 return False
         except KeyError:
-            False
+            return False
 
     def add_edge(self, origin, destination, weight=1):
         if self.is_edge(origin, destination):
@@ -58,7 +106,7 @@ class MatrixGraph(Graph):
                 if not self.is_directed:
                     self.__graph[destination, origin] = 1
         except KeyError:
-            raise KeyError("Non-existent vertex. Add it first and try again.")
+            raise ValueError("Non-existent vertex. Add it first and try again.")
 
     def remove_edge(self, origin, destination):
         if not self.is_edge(origin, destination):
@@ -72,7 +120,7 @@ class MatrixGraph(Graph):
             if not self.is_directed:
                 self.__graph[destination, origin] = 0
         except KeyError:
-            raise KeyError("Non-existent vertex. Add it first and try again.")
+            raise ValueError("Non-existent vertex. Add it first and try again.")
 
     @property
     def number_of_edges(self):
@@ -94,8 +142,10 @@ class MatrixGraph(Graph):
 
         return out_degree
 
-    def adjacency_of(self, vertex):
-        vertex = self.vertices_list[str(vertex)]
-        occurrences = self.__graph[vertex, :]
+    def adjacency_of(self, vertex, with_weight=True):
+        occurrences = self[vertex, :]
+
+        if self.is_pondered and with_weight:
+            return [(self.vertices[i], occurrences[i]) for i in range(self.number_of_vertices) if occurrences[i] != 0]
 
         return [self.vertices[i] for i in range(self.number_of_vertices) if occurrences[i] != 0]

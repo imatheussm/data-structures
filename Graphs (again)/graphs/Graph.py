@@ -1,11 +1,7 @@
-def depth_search(vertex, search_times):
-    pass
-
-
 class Graph:
     def __init__(self, vertices, is_directed, is_pondered):
         self.__directed = is_directed
-        self.__pondered = is_pondered
+        self._pondered = is_pondered
         self.__cyclic = False
 
         self.vertices_list = {}
@@ -18,7 +14,14 @@ class Graph:
 
     @property
     def is_pondered(self):
-        return self.__pondered
+        return self._pondered
+
+    @is_pondered.setter
+    def is_pondered(self, is_pondered):
+        if type(is_pondered) is not bool:
+            raise TypeError("This property should receive a boolean value.")
+
+        self._pondered = is_pondered
 
     @property
     def is_cyclic(self):
@@ -34,6 +37,27 @@ class Graph:
             return True
         else:
             return False
+
+    @property
+    def edges(self):
+        edges = []
+
+        if self.is_pondered:
+            for origin in self.vertices:
+                for destination, weight in self.adjacency_of(origin):
+                    if not self.is_directed and (destination, origin, weight) not in edges:
+                        edges.append((origin, destination, weight))
+                    elif self.is_directed:
+                        edges.append((origin, destination, weight))
+        else:
+            for origin in self.vertices:
+                for destination in self.adjacency_of(origin):
+                    if not self.is_directed and (destination, origin) not in edges:
+                        edges.append((origin, destination))
+                    elif self.is_directed:
+                        edges.append((origin, destination))
+
+        return tuple(edges)
 
     def __len__(self):
         return len(self.vertices)
@@ -65,7 +89,7 @@ class Graph:
         search_times[vertex][0] = self.__current_time
         vertex = str(vertex)
 
-        for v in self.adjacency_of(vertex):
+        for v in self.adjacency_of(vertex, False):
             if search_times[v][0] == -1:
                 self.__current_time += 1
                 self.__depth_search(v, search_times)
@@ -88,7 +112,7 @@ class Graph:
         self.__breadth_search(initial_vertex, search_times, stack)
 
         for vertex in self.vertices:
-            if search_times[vertex] == -1:
+            if search_times[vertex][0] == -1:
                 self.__breadth_search(vertex, search_times, stack)
 
         return search_times
@@ -98,7 +122,7 @@ class Graph:
             search_times[vertex][0] = self.__current_time
         self.__current_time += 1
 
-        for v in self.adjacency_of(vertex):
+        for v in self.adjacency_of(vertex, False):
             if search_times[v][0] == -1:
                 search_times[v][0] = self.__current_time
                 search_times[v][1] = vertex
@@ -108,13 +132,21 @@ class Graph:
             self.__breadth_search(stack.pop(0), search_times, stack)
 
     def shortest_path_between(self, origin, destination):
-        search_times = self.breadth_first_search(origin)
         origin, destination = str(origin), str(destination)
+
+        if not self.is_vertex(origin) or not self.is_vertex(destination):
+            raise KeyError("Non-existent vertex. Add it first and try again.")
+
+        search_times = self.breadth_first_search(origin)
         path = [destination]
+
         vertex = search_times[destination][1]
         while vertex is not None:
             path.insert(0, vertex)
             vertex = search_times[vertex][1]
+
+        if path[0] != origin or path[-1] != destination:
+            return None
 
         return path
 

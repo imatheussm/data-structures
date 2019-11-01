@@ -9,6 +9,7 @@ class ListGraph(Graph):
 
         self.vertices_list = {str(vertex): {} for vertex in vertices}
 
+
     def __getitem__(self, item):
         return self.vertices_list.__getitem__(str(item))
 
@@ -18,9 +19,38 @@ class ListGraph(Graph):
         representation = "<ListGraph object>\n"
 
         for vertex in self.vertices:
-            representation += str(vertex).ljust(max_length, " ") + " -> " + ", ".join(self[vertex].keys()) + "\n"
+            if self.is_pondered:
+                adjacency = [f"{destination}: {weight}" for destination, weight in self[vertex].items()]
+            else:
+                adjacency = [f"{destination}" for destination in self[vertex].keys()]
+            representation += str(vertex).ljust(max_length, " ") + " -> " + ", ".join(adjacency) + "\n"
 
         return representation
+
+    @property
+    def is_matrix(self):
+        return False
+
+    @property
+    def is_list(self):
+        return True
+
+    @property
+    def is_pondered(self):
+        return self._pondered
+
+    @is_pondered.setter
+    def is_pondered(self, pondered):
+        if type(pondered) is not bool:
+            raise TypeError("This property should receive a boolean value.")
+
+        self._pondered = pondered
+
+        if not pondered:
+            for origin in self.vertices:
+                for destination in self[origin].keys():
+                    if self[origin][destination] != 0:
+                        self[origin][destination] = 1
 
     def is_edge(self, origin, destination):
         origin, destination = str(origin), str(destination)
@@ -46,15 +76,15 @@ class ListGraph(Graph):
             if weight == 0:
                 raise ValueError("The weight must be a non-null number.")
 
-            self.vertices_list[origin][destination] = weight
+            self.vertices_list[origin][destination] = float(weight)
 
             if not self.is_directed:
-                self.vertices_list[destination][origin] = weight
+                self.vertices_list[destination][origin] = float(weight)
         else:
-            self.vertices_list[origin][destination] = 1
+            self.vertices_list[origin][destination] = 1.0
 
             if not self.is_directed:
-                self.vertices_list[destination][origin] = 1
+                self.vertices_list[destination][origin] = 1.0
 
     def remove_edge(self, origin, destination):
         if not self.is_edge(origin, destination):
@@ -97,7 +127,8 @@ class ListGraph(Graph):
 
         return out_degree
 
-    def adjacency_of(self, vertex):
-        vertex = str(vertex)
+    def adjacency_of(self, vertex, with_weight=True):
+        if self.is_pondered and with_weight:
+            return sorted(list(self[vertex].items()))
 
-        return sorted(list(self.vertices_list[vertex].keys()))
+        return sorted(list(self[vertex].keys()))
