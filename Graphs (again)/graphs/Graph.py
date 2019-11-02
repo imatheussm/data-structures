@@ -1,3 +1,6 @@
+from graphs.helper import flatten
+
+
 class Graph:
     def __init__(self, is_directed, is_pondered):
         self._directed = is_directed
@@ -47,17 +50,51 @@ class Graph:
         else:
             return False
 
-    # @property
-    # def linked_components(self):
-    #     search_times = self.breadth_first_search(self.vertices[0])
-    #     linked_components = {vertex: [vertex] for vertex in search_times.keys() if search_times[vertex][1] is None}
-    #
-    #     for origin in linked_components.keys():
-    #         for destination in self.vertices:
-    #             if origin != destination and self.shortest_path_between(origin, destination) is not None:
-    #                 linked_components[origin].append(destination)
-    #
-    #     return tuple(tuple(component) for component in linked_components.values())
+    @property
+    def linked_components(self):
+        search_times = self.depth_first_search(self.vertices[0])
+        biggest_times = sorted(list(search_times.items()), key=lambda x: x[1][1], reverse=True)
+        search_times_again = {vertex: [-1, -1] for vertex in self.vertices}
+
+        for vertex, _ in biggest_times:
+            if search_times_again[vertex][0] == -1:
+                self.__current_time = 0
+                self.__depth_search(vertex, search_times_again)
+
+        self.__current_time = None
+        linked_components = {vertex: [vertex] for vertex in search_times_again.keys() if search_times_again[vertex][0] == 0}
+
+        for origin in linked_components.keys():
+            for destination in self.vertices:
+                if origin != destination and self.shortest_path_between(origin, destination) is not None:
+                    linked_components[origin].append(destination)
+
+        return tuple(tuple(sorted(list(component))) for component in linked_components.values())
+
+    @property
+    def strongly_linked_components(self):
+        if not self.is_directed:
+            transposed_graph = self
+        else:
+            transposed_graph = self.transpose()
+
+        search_times = self.depth_first_search(self.vertices[0])
+        biggest_times = sorted(list(search_times.items()), key=lambda x: x[1][1], reverse=True)
+        strongly_linked_components = []
+
+        for vertex, _ in biggest_times:
+            if vertex not in flatten(strongly_linked_components):
+                search_times_transposed = {vertex: [-1, -1] for vertex in self.vertices}
+                transposed_graph.__current_time = 0
+                transposed_graph.__depth_search(vertex, search_times_transposed)
+                component = tuple(vertex for vertex in search_times_transposed.keys()
+                                  if search_times_transposed[vertex][0] != -1 and
+                                  vertex not in flatten(strongly_linked_components))
+                strongly_linked_components.append(component)
+
+        self.__current_time = None
+
+        return tuple(sorted(strongly_linked_components))
 
     @property
     def edges(self):
