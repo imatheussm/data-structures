@@ -897,7 +897,6 @@ class Graph:
 
         for vertex in self.vertices:
             if not results[vertex][-1]:
-                print(f"Beginning another Dijkstra Search in {vertex}...")
                 self.__dijkstra_search(vertex, results)
 
         return {vertex: results[vertex][:2] for vertex in results.keys()}
