@@ -461,14 +461,14 @@ class MatrixGraph(Graph):
 
             The adjacency of the vertex with the weights (if applicable) contained in the MatrixGraph object.
         """
-        if not self.is_vertex(vertex):
-            raise ValueError("Non-existent vertex. Add it first and try again.")
-
         if (
             type(vertex) is not list
             and type(vertex) is not tuple
             and type(vertex) is not set
         ):
+            if not self.is_vertex(vertex):
+                raise ValueError("Non-existent vertex. Add it first and try again.")
+
             occurrences = self[vertex, :]
 
             if self.is_pondered and with_weight:
