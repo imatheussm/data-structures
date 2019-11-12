@@ -1,6 +1,6 @@
 *.pyc
-*-checkpoint.ipynb
-*-checkpoint.py
+**/*-checkpoint.ipynb
+**/*-checkpoint.py
 **/.idea/*
 **/.vs/*
 **/.vscode/*
