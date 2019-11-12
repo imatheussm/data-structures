@@ -1,3 +1,5 @@
+import scipy as sp
+
 from graphs.helper import flatten
 
 
@@ -181,9 +183,9 @@ class Graph:
         for origin in linked_components.keys():
             for destination in self.vertices:
                 if (
-                    origin != destination
-                    and self.get_shortest_path_between(origin, destination)[0]
-                    is not None
+                        origin != destination
+                        and self.get_shortest_path_between(origin, destination)[0]
+                        is not None
                 ):
                     linked_components[origin].append(destination)
 
@@ -275,8 +277,8 @@ class Graph:
             for origin in self.vertices:
                 for destination, weight in self.adjacency_of(origin):
                     if (
-                        not self.is_directed
-                        and (destination, origin, weight) not in edges
+                            not self.is_directed
+                            and (destination, origin, weight) not in edges
                     ):
                         edges.append((origin, destination, weight))
                     elif self.is_directed:
@@ -444,6 +446,11 @@ class Graph:
 
             The discovery times and predecessor vertices for each vertex of the Graph object.
         """
+        if self.is_pondered:
+            raise TypeError(
+                "The Breadth-First Search Algorithm was meant to be used in pondered graphs. For this Graph object, "
+                "use the Dijkstra Search Algorithm."
+            )
         search_times = {vertex: [-1, None] for vertex in self.vertices}
 
         if initial_vertex is None:
@@ -507,7 +514,7 @@ class Graph:
         while len(stack) > 0:
             self.__breadth_search(stack.pop(0), search_times, stack)
 
-    def get_shortest_path_between(self, origin, destination):
+    def get_shortest_path_between(self, origin, destination, distances=None):
         """Finds the shortest path (if any) between two vertices of the Graph object.
 
         Depending on the Graph object properties, this method might take advantage either of the breadth-first search
@@ -525,6 +532,11 @@ class Graph:
 
             The destination vertex. Given that all vertices labels are treated as strings, this parameter will be
             casted to string prior to the verification.
+
+        distances : dict of {str: int}
+
+            The distances dictionary. It is useful to avoid creating a search for every call of this method. However,
+            might result in unexpected outcomes if used improperly.
 
         Raises
         ------
@@ -545,10 +557,11 @@ class Graph:
         if not self.is_vertex(origin) or not self.is_vertex(destination):
             raise ValueError("Non-existent vertex. Add it first and try again.")
 
-        if not self.is_pondered:
-            distances = self.breadth_first_search(origin)
-        else:
-            distances = self.dijkstra_search(origin)
+        if distances is None:
+            if not self.is_pondered:
+                distances = self.breadth_first_search(origin)
+            else:
+                distances = self.dijkstra_search(origin)
 
         path = [destination]
         vertex = distances[destination][1]
@@ -561,7 +574,7 @@ class Graph:
             return None, -1
 
         if not self.is_pondered:
-            length = len(path)
+            length = len(path) - 1
         else:
             length = distances[destination][0]
 
@@ -749,7 +762,7 @@ class Graph:
                     edge
                     for edge in graph.edges
                     if edge[0] in vertices
-                    and edge[1] in graph.adjacency_of(vertices, False)
+                       and edge[1] in graph.adjacency_of(vertices, False)
                 ),
                 key=lambda x: x[-1],
             )
@@ -880,9 +893,9 @@ class Graph:
         """
         if not self.is_pondered:
             raise TypeError(
-                "The Dijkstra Algorithm was meant to be used in pondered graphs."
+                "The Dijkstra Search Algorithm was meant to be used in pondered graphs. For this Graph object, "
+                "use the Breadth-First Search Algorithm."
             )
-
         if initial_vertex is None:
             initial_vertex = self.vertices[0]
         else:
@@ -927,7 +940,7 @@ class Graph:
 
         for v, weight in adjacency:
             if (results[v][1] is None and results[v][0] == -1) or (
-                results[v][0] > results[vertex][0] + weight
+                    results[v][0] > results[vertex][0] + weight
             ):
                 results[v][0] = results[vertex][0] + weight
                 results[v][1] = vertex
@@ -973,9 +986,9 @@ class Graph:
             )
 
         return (
-            self.number_of_edges
-            - self.number_of_vertices
-            + self.number_of_linked_components
+                self.number_of_edges
+                - self.number_of_vertices
+                + self.number_of_linked_components
         )
 
     @property
@@ -993,6 +1006,103 @@ class Graph:
             The number of edges contained in the Graph object.
         """
         return len(self.edges)
+
+    @property
+    def distances_matrix(self):
+        """Returns the pairwise distances between all Graph object vertices.
+
+        Returns
+        -------
+
+        sp.ndarray
+
+            A pairwise distances matrix of the Graph object.
+        """
+        distances_matrix = sp.zeros((self.number_of_vertices,
+                                     self.number_of_vertices))
+
+        mapping = {vertex: i for i, vertex in enumerate(self.vertices)}
+
+        for vertex in self.vertices:
+            if not self.is_pondered:
+                distances = self.breadth_first_search(vertex)
+            else:
+                distances = self.dijkstra_search(vertex)
+
+            for i, v in enumerate(self.vertices):
+                # print(f"mapping[v], i = {mapping[v]}, {i}")
+                # print(f"Distance: {self.get_shortest_path_between(vertex, v, distances)[1]}")
+                distances_matrix[mapping[vertex], i] = self.get_shortest_path_between(vertex, v, distances)[1]
+
+        return distances_matrix
+
+    @property
+    def eccentricities(self):
+        """Returns the eccentricity of each vertex of the Graph object.
+
+        Eccentricity is the greatest distance between a given vertex and any of the remaining ones. It is useful to
+        find the graph radius, diameter and center.
+
+        Returns
+        -------
+
+        dict of {str: int or float}
+
+            A dictionary of eccentricities of each vertex of the Graph object.
+        """
+        distances = self.distances_matrix
+
+        return {vertex: distances[i].max() for i, vertex in enumerate(self.vertices)}
+
+    @property
+    def radius(self):
+        """Returns the radius of the Graph object.
+
+        The radius is the smallest eccentricity of the Graph object vertices – that is, the smallest of the highest
+        distances between two vertices. It is useful to determine the graph center.
+
+        Returns
+        -------
+
+        int or float
+
+            The radius of the Graph object.
+        """
+        return min(self.eccentricities.values())
+
+    @property
+    def center(self):
+        """Returns the center of the Graph object.
+
+        The graph center is the vertex (or vertices) whose eccentricity is equal to the graph radius. As such,
+        it takes advantage of the radius property of the Graph object.
+
+        Returns
+        -------
+
+        tuple
+
+            The center of the Graph object.
+        """
+        radius, eccentricities = self.radius, self.eccentricities
+
+        return tuple([vertex for vertex in eccentricities.keys() if eccentricities[vertex] == radius])
+
+    @property
+    def diameter(self):
+        """Returns the diameter of the Graph object.
+
+        The diameter is the greatest eccentricity of the Graph object vertices – that is, the greatest of the highest
+        distances between two vertices.
+
+        Returns
+        -------
+
+        int or float
+
+            The diameter of the Graph object.
+        """
+        return max(self.eccentricities.values())
 
     def copy(self, with_edges=True):
         """Returns a copy of the Graph object.

@@ -36,6 +36,8 @@ class ListGraph(Graph):
 
             A ListGraph object.
         """
+        vertices.sort()
+
         super().__init__(is_directed, is_pondered)
 
         self.vertices_list = {str(vertex): {} for vertex in vertices}

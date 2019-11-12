@@ -36,10 +36,12 @@ class MatrixGraph(Graph):
 
             A MatrixGraph object.
         """
+        vertices = sorted(vertices)
+
         super().__init__(is_directed, is_pondered)
 
         self.vertices_list = {
-            str(vertex): index for index, vertex in enumerate(sorted(vertices))
+            str(vertex): index for index, vertex in enumerate(vertices)
         }
 
         if self.is_pondered:
