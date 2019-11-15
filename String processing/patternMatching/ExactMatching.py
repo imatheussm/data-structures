@@ -1,6 +1,5 @@
 from patternMatching import Matching
 
-
 class ExactMatching(Matching):
     def __init__(self, file_path, pattern=None):
         super().__init__(file_path, pattern)
@@ -127,3 +126,30 @@ class ExactMatching(Matching):
                 break
 
             i += table[char]
+
+    def ShiftAnd(self):
+        # Initializes the mask of each pattern character with a sequence of 0
+        mask = {char : ['0'] * self.m for char in self.pattern}  
+
+        # For each character's position in the pattern, put 1 in the corresponding position in the character's mask.
+        for i in range(self.m):
+            mask[self.pattern[i]][i] = '1' 
+
+        R = 0
+
+        # Converting each mask to string then to integer (to make bitwise operations possible)
+        for char in mask:
+            mask[char] = int(''.join(mask[char]), 2)
+
+        # Initializes the mask of all the other characters (represented by *) that are not being used in the pattern
+        mask['*'] = 0
+
+        print(f"Mask: {mask}") # Mask with decimal values!
+
+        for i in range(self.n):
+            char = self.text[i] if self.text[i] in mask.keys() else '*' 
+
+            R = (R >> 1 | int('1' + '0' * (self.m-1), 2)) & mask[char]
+
+            if list(bin(R))[-1] == '1': # Checking if the last element of R is equals to 1. 
+                print(f"Pattern matching occurred at position {i - self.m + 1}")
