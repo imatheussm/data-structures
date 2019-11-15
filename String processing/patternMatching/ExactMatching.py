@@ -41,10 +41,15 @@ class ExactMatching(Matching):
 
     def new_BMH(self):
         table = {item: self.m - index - 1 for index, item in enumerate(self.pattern[:self.m - 1])}
-        table[self.pattern[self.m - 1]], table['*'] = self.m, self.m  # Adding default values to the last pattern
-                                                                      # character and to all the other characters (
-        print(table)                                                  # represented by *) that are not being used in the
-                                                                      # pattern.
+
+        # If the last pattern character is not already in the table, the default value (pattern length) is defined for it. If not, it keeps with the same value. 
+        table[self.pattern[self.m - 1]] = self.m if self.pattern[self.m - 1] not in table.keys() else table[self.pattern[self.m - 1]]
+
+        # The default value (pattern length) is defined for all the other characters (represented by *) that are not being used in the pattern.
+        table['*'] = self.m 
+                                                                      
+        print(table)                                                  
+                                                                      
         i, p = self.m - 1, 0
 
         while i < self.n:
@@ -59,7 +64,10 @@ class ExactMatching(Matching):
 
     def BMH(self):  # similar to ziviani's implementation with some adjustments
         table = {item: self.m - index - 1 for index, item in enumerate(self.pattern[:self.m - 1])}
-        table[self.pattern[self.m - 1]], table['*'] = self.m, self.m
+
+        table[self.pattern[self.m - 1]] = self.m if self.pattern[self.m - 1] not in table.keys() else table[self.pattern[self.m - 1]]
+        
+        table['*'] = self.m
 
         i = self.m - 1
 
@@ -76,7 +84,6 @@ class ExactMatching(Matching):
             i += table[self.text[i] if self.text[i] in self.pattern else '*']
 
     def new_BMHS(self):
-
         table = {item: self.m - index for index, item in enumerate(self.pattern)}
         table['*'] = self.m + 1
         print(table)
@@ -84,7 +91,7 @@ class ExactMatching(Matching):
         i, p = self.m - 1, 0
 
         while i < self.n:
-            print(f"Pattern: {self.pattern} Text: {self.text[p:i + 1]}")
+            # print(f"Pattern: {self.pattern} Text: {self.text[p:i + 1]}")
 
             if self.pattern == self.text[p:i + 1]:
                 print(f"Pattern matching occurred at position {p}")
