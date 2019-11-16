@@ -135,8 +135,6 @@ class ExactMatching(Matching):
         for i in range(self.m):
             mask[self.pattern[i]][i] = '1' 
 
-        R = 0
-
         # Converting each mask to string then to integer (to make bitwise operations possible)
         for char in mask:
             mask[char] = int(''.join(mask[char]), 2)
@@ -146,10 +144,12 @@ class ExactMatching(Matching):
 
         print(f"Mask: {mask}") # Mask with decimal values!
 
+        R = 0
+
         for i in range(self.n):
             char = self.text[i] if self.text[i] in mask.keys() else '*' 
 
             R = (R >> 1 | int('1' + '0' * (self.m-1), 2)) & mask[char]
 
-            if list(bin(R))[-1] == '1': # Checking if the last element of R is equals to 1. 
+            if bin(R)[-1] == '1': # Checking if the last element of R is equal to 1. 
                 print(f"Pattern matching occurred at position {i - self.m + 1}")
