@@ -16,7 +16,11 @@ x.BMH()
 y = patternMatching.ExactMatching("example3.txt", "cade")
 y.new_BMHS()
 
-print("** Testing ShiftAnd **")
+print("** ShiftAnd exato **")
 c.ShiftAnd()
 x.ShiftAnd()
 y.ShiftAnd()
+
+print("*** ShiftAnd aproximado ***")
+a = patternMatching.FuzzyMatching("example4.txt", "teste")
+a.ShiftAnd(1)
