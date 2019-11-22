@@ -1,11 +1,11 @@
-from patternMatching import helpers
+from patternMatching.helpers import handle_txt
 
 
 class Matching:
     def __init__(self, file_path, pattern=None):
         self.__pattern_length, self.__text_length = None, None
 
-        self.text = helpers.handle_txt(file_path)
+        self.text = handle_txt(file_path)
         self.pattern = pattern
 
     @property
@@ -37,3 +37,7 @@ class Matching:
     @property
     def m(self):
         return self.__pattern_length
+
+    @property 
+    def fixedMask(self):
+        return int('1' + '0' * (self.m - 1), 2)

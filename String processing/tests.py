@@ -5,22 +5,25 @@ import patternMatching
 sys_path.append(getcwd())
 
 c = patternMatching.ExactMatching("example.txt", "test")
-
-#print(c.new_brute_force())
-c.new_BMH()
-# c.new_BMHS()
+print(c.new_brute_force())
+print(c.new_BMH())
+print(c.new_BMHS())
 
 x = patternMatching.ExactMatching("example2.txt", "tooth")
-x.BMH()
+print(x.new_BMH())
 
 y = patternMatching.ExactMatching("example3.txt", "cade")
-y.new_BMHS()
+print(y.new_BMHS())
 
 print("** ShiftAnd exato **")
-c.ShiftAnd()
-x.ShiftAnd()
-y.ShiftAnd()
+print(c.ShiftAnd())
+print(x.ShiftAnd())
+print(y.ShiftAnd())
 
-print("*** ShiftAnd aproximado ***")
+print("** ShiftAnd aproximado **")
 a = patternMatching.FuzzyMatching("example4.txt", "teste")
-a.ShiftAnd(1)
+print(a.ShiftAnd(1, True, False, False))
+print(a.ShiftAnd(1, False, True, False))
+print(a.ShiftAnd(1, False, False, True))
+print(a.ShiftAnd(1, True, False, False)) 
+
