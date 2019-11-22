@@ -39,5 +39,5 @@ class Matching:
         return self.__pattern_length
 
     @property 
-    def fixedMask(self):
+    def fixed_mask(self):
         return int('1' + '0' * (self.m - 1), 2)

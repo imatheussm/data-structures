@@ -1,5 +1,6 @@
 from patternMatching import Matching
-from patternMatching.helpers import handle_mask, checkMatch
+from patternMatching.helpers import handle_mask, check_match
+
 
 class ExactMatching(Matching):
     def __init__(self, file_path, pattern=None):
@@ -112,7 +113,7 @@ class ExactMatching(Matching):
 
         table['*'] = self.m + 1
 
-        print(table)
+        # print(table)
 
         i = self.m - 1
 
@@ -145,8 +146,8 @@ class ExactMatching(Matching):
         for i in range(self.n):
             char = self.text[i] if self.text[i] in mask.keys() else '*' 
 
-            R = (R >> 1 | self.fixedMask) & mask[char]
+            R = (R >> 1 | self.fixed_mask) & mask[char]
 
-            if checkMatch(R): occurrences.append((i - self.m + 1, i))
+            if check_match(R): occurrences.append((i - self.m + 1, i))
         
         return tuple(occurrences)

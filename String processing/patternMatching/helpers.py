@@ -6,6 +6,7 @@ def handle_txt(file_name):
     except FileNotFoundError:
         raise FileNotFoundError(f"No such file or directory has been found: text_examples/{file_name}")
 
+
 def handle_mask(pattern):
         mask = {char : ['0'] * len(pattern) for char in pattern}  
 
@@ -18,5 +19,7 @@ def handle_mask(pattern):
 
         return mask
 
-def checkMatch(mask):
+
+def check_match(mask):
     return True if bin(mask)[-1] == '1' else False
+

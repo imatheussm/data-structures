@@ -1,12 +1,13 @@
 from patternMatching import Matching
-from patternMatching.helpers import handle_mask, checkMatch
+from patternMatching.helpers import handle_mask, check_match
+
 
 class FuzzyMatching(Matching):
     def __init__(self, file_path, pattern=None):
         super().__init__(file_path, pattern)
 
     def ShiftAnd(self, k, insertion=True, substitution=True, removal=True):
-        occurrences = {'i': [], 's': [], 'r' : [], 'e' : []}
+        occurrences = {'i': [], 's': [], 'r': [], 'e': []}
 
         mask = handle_mask(self.pattern)
         
@@ -23,38 +24,38 @@ class FuzzyMatching(Matching):
 
             old_R = R[0]
 
-            new_R = (old_R >> 1 | self.fixedMask) & mask[char]
+            new_R = (old_R >> 1 | self.fixed_mask) & mask[char]
 
             R[0] = new_R
             # print(f"R[0] na iteração {i}: {R[0]}")
 
-            if checkMatch(R[0]): occurrences['e'].append((i - self.m + 1, i))
+            if check_match(R[0]): occurrences['e'].append((i - self.m + 1, i))
 
-            for j in range(1, k+1):
+            for j in range(1, k + 1):
                 aux_R = new_R
 
                 new_R = ((R[j] >> 1) & mask[char]) 
 
-                if insertion:
+                if insertion is True:
                     new_R |= old_R
 
-                    if checkMatch(new_R): occurrences['i'].append((i - self.m + 1 - j, i))
+                    if check_match(new_R): occurrences['i'].append((i - self.m + 1 - j, i))
                     # print(f"Inserção que começa na posição {i - self.m + 1 - j} e termina em {i}!")
                 
-                if substitution:
+                if substitution is True:
                     new_R |= (old_R >> 1)
 
-                    if checkMatch(new_R): occurrences['s'].append((i - self.m + 1, i))
+                    if check_match(new_R): occurrences['s'].append((i - self.m + 1, i))
                     # print(f"Substituição que começa na posição {i - self.m + 1} e termina em {i}!")
 
-                if removal:
+                if removal is True:
                     new_R |= (aux_R >> 1)
 
-                    if checkMatch(new_R): occurrences['r'].append((i - self.m + 1 + j, i))
+                    if check_match(new_R): occurrences['r'].append((i - self.m + 1 + j, i))
                     # print(f"Remoção que começa na posição {i - self.m + 1 + j} e termina em {i}!")
 
                 old_R = R[j]
 
-                R[j] = new_R | self.fixedMask
+                R[j] = new_R | self.fixed_mask
 
-        return occurrences
+        return {key: tuple(occurrences[key]) for key in occurrences.keys()}
